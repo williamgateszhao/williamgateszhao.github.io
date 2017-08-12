@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>（新版）对gaeproxy的“https代理”功能之分析和说明</title>
+  <meta name="description" content="  经过我旧版文章分析后，gaeproxy的作者Max Lv很诚恳和大度地在项目主页和官方twitter帐号上解释了“https代理”功能，并将本地址作为说明放在项目主页上，故我将较为耸人听闻的旧版移至另一地址，在本地址重做了一份简单的说明。  对我的文章给作者带来的一些误解表示歉意。  再次声明，我相信作者从未...">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="//assets/evil-icons.min.css">
+  <script src="//assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="//css/main.css">
+  <link rel="canonical" href="http://williamgateszhao.github.io//2013/02/gaeproxy-analysis/">
+  <link rel="alternate" type="application/rss+xml" title="WilliamGates' Blog" href="http://williamgateszhao.github.io//feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="//">WilliamGates' Blog</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="//">Home</a></li>
+          <li><a href="//archive">Posts</a></li>
+          <li><a href="//about">About</a></li>
+          <li><a href="//feed.xml">RSS</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <hr>
+    <div class="site-nav">
+      WG's works<br>
+      <nav>
+        <ul class="page-link">
+          <li><a href="">LightPIC</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <hr>
+    <div class="site-nav">
+      WG's friends<br>
+      <nav>
+        <ul class="page-link">
+          <li><a href="">danielfeng</a></li>
+          <li><a href="">fmiaoz</a></li>
+          <li><a href="">frank05</a></li>
+          <li><a href="">Light</a></li>
+          <li><a href="">lususlee</a></li>
+          <li><a href="">nulltao</a></li>
+          <li><a href="">OnlyLonely & Marshall</a></li>
+          <li><a href="">Pierric</a></li>
+          <li><a href="">Samson</a></li>
+          <li><a href="">Rufev & survivur</a></li>
+          <li><a href="">sunng</a></li>
+          <li><a href="">Vincent</a></li>
+          <li><a href="">yaoge123</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">（新版）对gaeproxy的“https代理”功能之分析和说明</h1>
+    <p class="artilce_meta"><time datetime="2013-02-24T16:44:48+08:00" itemprop="datePublished">Feb 24, 2013</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <ul>
+  <li>经过我旧版文章分析后，gaeproxy的作者Max Lv很诚恳和大度地在项目主页和官方twitter帐号上解释了“https代理”功能，并将本地址作为说明放在项目主页上，故我将较为耸人听闻的旧版移至另一地址，在本地址重做了一份简单的说明。</li>
+  <li>对我的文章给作者带来的一些误解表示歉意。</li>
+  <li>再次声明，我相信作者从未也永远不会谋求窃取/篡改用户数据，作者提供的该功能是基于善意，我个人只是指出整个流程中的一个安全风险，并希望所有用户都有所了解之后自己选择是否要使用。</li>
+</ul>
+
+<p>　　<a href="https://github.com/madeye/gaeproxy">gaeproxy</a>是goagent在android上的客户端，作者是<a href="http://madeye.me/">Max Lv</a>，<a href="https://code.google.com/p/goagent/">goagent</a>在google code页面上将其作为android上使用goagent的解决方案来介绍。</p>
+
+<p>　　说明1：gaeproxy的“https代理”功能<br />
+　　该功能实际上是将https的请求和回应通过作者提供的代理服务器来进行代理，原理如下：<br />
+　　没有打开“https代理”功能时，所有的流量都通过goagent服务器端，而goagent服务器端是部署在google appengine（GAE）上的，在客户和服务器之间，只有google的服务器存在，这个过程中只要你信任google的服务器，就是相对安全的。如图：</p>
+
+<p><img src="/assets/img/gaeproxy-analysis-01.png" alt="gaeproxy-analysis-01" /></p>
+
+<p>　　打开“https代理”功能时，https流量（往往是敏感数据，不过会被加密，并非明文）会通过作者提供的服务器代理，而不经过goagent的服务器端，这时候如果有人攻破了作者提供的服务器，在其上进行中间人欺骗，或者解密用户与目的服务器交换的数据（并非完全不可能），会给用户造成无法估量的损失。如图：</p>
+
+<p><img src="/assets/img/gaeproxy-analysis-02.png" alt="gaeproxy-analysis-02" /></p>
+
+<p>　　说明2：风险所在<br />
+　　如上文所述，典型的goagent架构全程只通过google所维护的服务器来代理，虽然由于gae不支持https connect，所以在google的服务器上https请求会被解码并重编码（我理解如此，未必正确），所以不管是PC还是android上访问https网站，都需要导入证书。<br />
+　　而gaeproxy作者提供的https代理不经过google的服务器，而是经过作者自己提供并维护的服务器，考虑到人力物力上的差距，作者维护的服务器在安全性上不如google的服务器来得可信，这就是我们所担心的。</p>
+
+<p>　　说明3：风险到底有多大<br />
+　　实际上这种风险与你购买收费VPN、SSH代理的风险是一样的，甚至小于使用免费VPN、SSH的风险（包括著名的地下铁），存在恶意的VPN和SSH提供商能够给你带来更大的损害。我只是提出了整个流程中的一种可能性，而且不满于作者（当时）未明示这一事实而已。实际上我猜测是由于android设备上直接使用典型goagent模式时，https的性能比较差（我实测如此），所以作者才添加了“https代理”这一功能，并非出于恶意，相反自己花费了经费。<br />
+　　实际上goagent的作者也承认，PC上典型的goagent架构也是不安全的，我们只是信任google的维护能力而已，并不是说goagent就是安全的。<br />
+　　实际上翻墙的方法无非两种，一种是通过各类代理，其中加入了一道甚至几道服务器后，信息被窃取/篡改的可能性显然会增加；另一种是通过对网络协议的修改，如西厢计划等小众方案，由于需要使用别人编写的软件，一样存在风险。没有一种翻墙方式是不增加信息被窃取/篡改的风险的，只能说一定程度上降低了被GFW窃取/篡改的风险而已。</p>
+
+<p>　　<strong>总结：既然gaeproxy的作者明示了“https代理”功能的原理，我对这个软件及其服务并无进一步的意见，我推荐大家继续使用这个软件。就我个人而言，我不会继续使用“https代理”这个功能，但如果你选择继续使用，风险并没有多么可怕。</strong></p>
+
+  </div>
+
+  <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(//assets/img/WG.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | William Gates</p>
+    <p class="bio">从2006年开始写Blog，从那时的苦情技术宅到现在初为人父的资深律师，删掉年少的刻奇、过时的技术文章、幼稚的社会评论，重新出发。</p>
+  </div>
+</section>
+
+
+  </footer>
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        <a href="https://github.com/williamgateszhao"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span></a>
+
+        
+        
+        <a href="https://twitter.com/WilliamGatesZh"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span></a>
+
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>
