@@ -4,10 +4,10 @@
     <title>WilliamGates' Blog</title>
     <description>四片叶子的三叶草
 </description>
-    <link>http://williamgateszhao.github.io//</link>
-    <atom:link href="http://williamgateszhao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 12 Aug 2017 22:41:08 +0800</pubDate>
-    <lastBuildDate>Sat, 12 Aug 2017 22:41:08 +0800</lastBuildDate>
+    <link>https://williamgateszhao.github.io//</link>
+    <atom:link href="https://williamgateszhao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sat, 12 Aug 2017 22:49:37 +0800</pubDate>
+    <lastBuildDate>Sat, 12 Aug 2017 22:49:37 +0800</lastBuildDate>
     <generator>Jekyll v3.5.1</generator>
     
       <item>
@@ -50,8 +50,8 @@
 　　而我想说，即使青春不可能无悔，也不要忘记勇敢地伸出你的手。&lt;/p&gt;
 </description>
         <pubDate>Mon, 19 May 2014 21:45:49 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2014/05/fight_for_happiness/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2014/05/fight_for_happiness/</guid>
+        <link>https://williamgateszhao.github.io//2014/05/fight_for_happiness/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2014/05/fight_for_happiness/</guid>
         
         
         <category>艺术随感</category>
@@ -187,8 +187,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 &lt;p&gt;　　希望所有的kindle用户都能顺利使用本程序，享受阅读的快乐。&lt;/p&gt;
 </description>
         <pubDate>Tue, 16 Apr 2013 11:05:14 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2013/04/kindle-reader-without-google-reader/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2013/04/kindle-reader-without-google-reader/</guid>
+        <link>https://williamgateszhao.github.io//2013/04/kindle-reader-without-google-reader/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2013/04/kindle-reader-without-google-reader/</guid>
         
         
         <category>Geek人生</category>
@@ -227,8 +227,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 &lt;p&gt;　　&lt;strong&gt;总结：既然gaeproxy的作者明示了“https代理”功能的原理，我对这个软件及其服务并无进一步的意见，我推荐大家继续使用这个软件。就我个人而言，我不会继续使用“https代理”这个功能，但如果你选择继续使用，风险并没有多么可怕。&lt;/strong&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 24 Feb 2013 16:44:48 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2013/02/gaeproxy-analysis/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2013/02/gaeproxy-analysis/</guid>
+        <link>https://williamgateszhao.github.io//2013/02/gaeproxy-analysis/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2013/02/gaeproxy-analysis/</guid>
         
         
         <category>Geek人生</category>
@@ -276,8 +276,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 　　&lt;strong&gt;即使我们无比相信开源软件的作者，我们也无法相信不受监督的权力。请将自由还给自由软件的用户。&lt;/strong&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 23 Feb 2013 23:03:47 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2013/02/gaeproxy-analysis-deprecated/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2013/02/gaeproxy-analysis-deprecated/</guid>
+        <link>https://williamgateszhao.github.io//2013/02/gaeproxy-analysis-deprecated/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2013/02/gaeproxy-analysis-deprecated/</guid>
         
         
         <category>Geek人生</category>
@@ -312,8 +312,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 &lt;p&gt;　　再次提醒，如果想把这个方法用于超频显示器，后果自负。顺便吐槽一下中文的技术论坛和帖子，里面似乎懂的人/似乎做成功的人，只字不提具体方法，都是说“用那个inf的方法”之流；不懂的人胡说八道，却装得亲自试验过一般。我从CDMA手机的GPS问题开始就彻底不信任中文的技术帖子（他们认为星图文件的更新服务器选&quot;us&quot;还是&quot;cn&quot;对GPS性能有根本影响，而经我测试两个选项下到的数据完全一样，MD5都一样）&lt;strong&gt;绝大多数中文的技术论坛上不成完整教程的短篇文字都是胡扯，要么是胡编，要么没有经过原理分析，几乎和跳大神一样，以心理作用代替实验结果&lt;/strong&gt;。&lt;/p&gt;
 </description>
         <pubDate>Wed, 18 Apr 2012 00:33:21 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</guid>
+        <link>https://williamgateszhao.github.io//2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</guid>
         
         
         <category>Geek人生</category>
@@ -379,8 +379,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 &lt;p&gt;　　十年十选，只不过是自己体验过的极少作品中的极少部分。我不想推荐什么，我只是记录下ACG带给我的心灵旅程。谢谢你们，整日研究如果赚宅男更多钱的ACG业者们，谢谢你们给了我们，一段段精彩的梦。&lt;/p&gt;
 </description>
         <pubDate>Tue, 14 Dec 2010 15:17:25 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2010/12/top-10-acgs-of-10-years/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2010/12/top-10-acgs-of-10-years/</guid>
+        <link>https://williamgateszhao.github.io//2010/12/top-10-acgs-of-10-years/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2010/12/top-10-acgs-of-10-years/</guid>
         
         
         <category>艺术随感</category>
@@ -408,8 +408,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 &lt;p&gt;&lt;img src=&quot;/assets/img/school-rumble-youth-is-fighting-for-nothing.jpg&quot; alt=&quot;school-rumble-youth-is-fighting-for-nothing&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Thu, 24 Dec 2009 22:49:16 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2009/12/school-rumble-youth-is-fighting-for-nothing/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2009/12/school-rumble-youth-is-fighting-for-nothing/</guid>
+        <link>https://williamgateszhao.github.io//2009/12/school-rumble-youth-is-fighting-for-nothing/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2009/12/school-rumble-youth-is-fighting-for-nothing/</guid>
         
         
         <category>艺术随感</category>
@@ -462,8 +462,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 &lt;/blockquote&gt;
 </description>
         <pubDate>Mon, 22 Dec 2008 00:01:03 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</guid>
+        <link>https://williamgateszhao.github.io//2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</guid>
         
         
         <category>艺术随感</category>
@@ -519,8 +519,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 
 </description>
         <pubDate>Tue, 18 Nov 2008 23:25:37 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2008/11/school-rumble-the-tragicomedy-of-our-youth/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2008/11/school-rumble-the-tragicomedy-of-our-youth/</guid>
+        <link>https://williamgateszhao.github.io//2008/11/school-rumble-the-tragicomedy-of-our-youth/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2008/11/school-rumble-the-tragicomedy-of-our-youth/</guid>
         
         
         <category>艺术随感</category>
@@ -558,8 +558,8 @@ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，�
 　　要说明的是，起这个标题，并不暗示”老了就滚“的意思，只是偶然想到觉得有趣，就用了。&lt;/p&gt;
 </description>
         <pubDate>Tue, 05 Feb 2008 23:03:43 +0800</pubDate>
-        <link>http://williamgateszhao.github.io//2008/02/like-a-rolling-rock-as-early-as-possible/</link>
-        <guid isPermaLink="true">http://williamgateszhao.github.io//2008/02/like-a-rolling-rock-as-early-as-possible/</guid>
+        <link>https://williamgateszhao.github.io//2008/02/like-a-rolling-rock-as-early-as-possible/</link>
+        <guid isPermaLink="true">https://williamgateszhao.github.io//2008/02/like-a-rolling-rock-as-early-as-possible/</guid>
         
         
         <category>艺术随感</category>
