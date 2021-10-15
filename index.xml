@@ -14,7 +14,7 @@
     <guid>https://blog.williamgates.net/post/2014-05-19-fight_for_happiness/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/fight_for_happiness.png&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/fight_for_happiness.png&#34; 
     alt=&#34;fight_for_happiness&#34; 
      
     width=500 
@@ -314,14 +314,14 @@
 　　该功能实际上是将https的请求和回应通过作者提供的代理服务器来进行代理，原理如下：&lt;br&gt;
 　　没有打开“https代理”功能时，所有的流量都通过goagent服务器端，而goagent服务器端是部署在google appengine（GAE）上的，在客户和服务器之间，只有google的服务器存在，这个过程中只要你信任google的服务器，就是相对安全的。如图：&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/gaeproxy-analysis-01.png&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/gaeproxy-analysis-01.png&#34; 
     alt=&#34;gaeproxy-analysis-01&#34; 
      
     width=625 
     height=&#34;725&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;　　打开“https代理”功能时，https流量（往往是敏感数据，不过会被加密，并非明文）会通过作者提供的服务器代理，而不经过goagent的服务器端，这时候如果有人攻破了作者提供的服务器，在其上进行中间人欺骗，或者解密用户与目的服务器交换的数据（并非完全不可能），会给用户造成无法估量的损失。如图：&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/gaeproxy-analysis-02.png&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/gaeproxy-analysis-02.png&#34; 
     alt=&#34;gaeproxy-analysis-02&#34; 
      
     width=617 
@@ -389,7 +389,7 @@
 &lt;!--description--&gt;
 &lt;p&gt;　　三、I&#39;&#39;s（漫画2000完结）/草莓100%（漫画2005完结）&lt;br&gt;
 　　之所以写在一起，主要的原因是……十个排不下……这两部作品常常被拿来比较，认为草莓借鉴I&#39;&#39;s的很多，但我认为草莓的东西南北设定做得更加张扬，故事也更加成熟，I&#39;&#39;s里的多角关系总让人觉得有点肮脏或者说背叛，但草莓除了最后东城没有取得胜利的“人气投票结局”以外，并不觉得任何一个人的感情是虚伪或者不道德的，可以说很好的保持了青春剧中常见的主题“喜欢一个人并不是错误”，这句话害了多少无知少女……&lt;br&gt;
-　　I&#39;&#39;s给人最深的感动就是关于理想的理解，“太假了”是很多人的感叹，但将其换个方式讲出来的FSN和H&amp;amp;C;何尝不是同一个意思？把对一个人的爱当成自己最高的理想，放弃一切与之冲突的理想和愿望，哪怕与世界为敌——其实都是一回事。“有些人不信我所信，所以你们看不到我看到的奇迹/有些人看到了奇迹，他们却把它仅仅当作一个与生活无关的童话/只有相信奇迹的人，奇迹才会降临在他的头上/我不是生活在童话中，我却相信奇迹，相信我能书写自己的童话”，&lt;a href=&#34;/2006/04/i-s-the-miracle-the-fairy-tale/&#34;&gt;这是我看完I&#39;&#39;s写下的&lt;/a&gt;，所谓感动，就是当自己心中的梦想得到支持的触动吧，哪怕这种支持只是一个虚构的故事。&lt;br&gt;
+　　I&#39;&#39;s给人最深的感动就是关于理想的理解，“太假了”是很多人的感叹，但将其换个方式讲出来的FSN和H&amp;amp;C;何尝不是同一个意思？把对一个人的爱当成自己最高的理想，放弃一切与之冲突的理想和愿望，哪怕与世界为敌——其实都是一回事。“有些人不信我所信，所以你们看不到我看到的奇迹/有些人看到了奇迹，他们却把它仅仅当作一个与生活无关的童话/只有相信奇迹的人，奇迹才会降临在他的头上/我不是生活在童话中，我却相信奇迹，相信我能书写自己的童话”，&lt;a href=&#34;https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/&#34;&gt;这是我看完I&#39;&#39;s写下的&lt;/a&gt;，所谓感动，就是当自己心中的梦想得到支持的触动吧，哪怕这种支持只是一个虚构的故事。&lt;br&gt;
 　　草莓么，如果没有最后纠结的结局，感动也许不会那么深刻——作者如此狡猾的选择了这样的结局，对于西军来说收获了胜利，同时又给东军留下了最深的回忆，作品霎时上了一个档次——“每当我想起深深爱上你的那一刻，我都会变得无比坚强”，这一句话比“志同道合的暧昧男女终于热恋在一起”的结局要深刻得多，不过有恶意催泪的嫌疑。&lt;/p&gt;
 &lt;p&gt;　　四、Fate/stay night（GAL2004，动画2006）&lt;br&gt;
 　　和大多数人一样先看了动画再玩游戏，动画里最有感觉的显然是第一个OP——THIS ILLUSION和最后Saber消失的那个镜头。纯情少年从动画里只能看到战斗的燃和Saber的萌，直到08还是09年玩穿游戏的HF线，才终于明白这个作品的深重。&lt;br&gt;
@@ -398,10 +398,10 @@
 　　如果爱，请深爱。这么二的一句话，竟如此契合FSN的主题。&lt;/p&gt;
 &lt;p&gt;　　五、Narcissu&lt;br&gt;
 　　既不Gal也不Game的作品，算是一个中篇电子小说。这里没有奇迹，没有戏剧化的结局，一切都是正常的生活，有人活着有人死去，不出乎意料，也不震撼人心。但是黑暗的背景中，隐藏着一种强有力的诉说。&lt;br&gt;
-　　“我们会痛苦会失望，其实都是因为我们还有希望，还有未来。不管承受着多么大的痛苦和压力，不管经历多么难以接受的事情，只要你还会痛苦，只要你还会失望，就说明你还心存希望。”&lt;a href=&#34;/2006/01/narcissu-time-goes-on/&#34;&gt;这是我当时写下的文字&lt;/a&gt;。作品不是指出或者发掘什么事物有问题，只是简单的陈述绝望与希望的关系——他并不憎恨绝望，也并不宣扬希望——提出问题不解答问题，这是我个人对于优秀作品一贯的评价标准。&lt;/p&gt;
+　　“我们会痛苦会失望，其实都是因为我们还有希望，还有未来。不管承受着多么大的痛苦和压力，不管经历多么难以接受的事情，只要你还会痛苦，只要你还会失望，就说明你还心存希望。”&lt;a href=&#34;https://blog.williamgates.net/2006/01/narcissu-time-goes-on/&#34;&gt;这是我当时写下的文字&lt;/a&gt;。作品不是指出或者发掘什么事物有问题，只是简单的陈述绝望与希望的关系——他并不憎恨绝望，也并不宣扬希望——提出问题不解答问题，这是我个人对于优秀作品一贯的评价标准。&lt;/p&gt;
 &lt;p&gt;　　六、校园迷糊大王（动画、漫画2008完结）&lt;br&gt;
 　　School Rumble到底是悲剧还是喜剧？相信没有多少人在看到结尾之前觉得这不是喜剧，但我在看了一半的时候，就曾经骂过作者，这不是把少年的梦想和执着当作笑柄么，那么努力却不能成功的少年，很可笑么？但当看到结尾之后，有那么多人认为是烂尾，有那么多人认为是悲剧的结尾，&lt;a href=&#34;2008/11/school-rumble-the-tragicomedy-of-our-youth/&#34;&gt;我却明白了作者的用意&lt;/a&gt;：他在用喜剧，无奈而又倔犟地，记叙，怀念，和高歌——青春。&lt;br&gt;
-　　至少从一个喧嚣的校园来看，他们都是失败者。青春就是一场必输无疑的战争，与自己，与岁月，与爱情，与命运。&lt;a href=&#34;/2009/12/school-rumble-youth-is-fighting-for-nothing/&#34;&gt;但青春最重要的，不是那必然失败的结果，而是明知道要失败，还是要奔赴战场的勇气&lt;/a&gt;。&lt;br&gt;
+　　至少从一个喧嚣的校园来看，他们都是失败者。青春就是一场必输无疑的战争，与自己，与岁月，与爱情，与命运。&lt;a href=&#34;https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/&#34;&gt;但青春最重要的，不是那必然失败的结果，而是明知道要失败，还是要奔赴战场的勇气&lt;/a&gt;。&lt;br&gt;
 　　让我最感动的镜头不是播磨在摩托车上的告白，不是天满推门进病房的那一刻，而是花井组织的毕业远足，在一夜的磨难和欢笑之后，当太阳初升，神经病和二傻子们相约“向太阳奔跑吧”然后拖着那些永不疲倦的身躯为了莫名其妙的第一名而狂奔的那一刻。那一刻，多么希望我也有过这样一个神经病班长，一个能忽悠住老师、能带着全班人一起做最傻的事情的班长，一个强悍而永不言败、敢于大声说出单恋的班长，也许那样，我们就能拥有一个这样傻到可怕、又可爱到令所有人向往的青春？&lt;br&gt;
 　　不可能的。不管是火山一般热情的班长还是世界级的摔跤手还是专业漫画家，都是不可能的，而你自己，甚至不可能是无用的泳衣相扑三人组。你不敢，你不能，你不会。这就是SR最令我痛哭流涕的地方。&lt;/p&gt;
 &lt;p&gt;　　七、零之使魔（小说2004开始未完结，动画2006开始未完结）&lt;br&gt;
@@ -409,14 +409,14 @@
 　　傲娇并不稀缺，钉宫也不是只配一个角色，废柴变无敌的男主满地都是，更强大的后宫总有更不要脸的作者来建设，但是就凭这段对话，小说我也要一直看下去。坚强而果决的爱，是真正的傲娇、真正的大小姐最可爱的地方。扭扭捏捏的所谓傲娇，无非只是个设定而已，只有与大小姐身份相符的坚强的心灵，才是“傲娇”这个设定最真正的核心。&lt;/p&gt;
 &lt;p&gt;　　八、蜂蜜与四叶草（动画、漫画2006完结）&lt;br&gt;
 　　第一季而第二季是两部作品。第一季是真实的励志片，第二季是励志的真实生活。&lt;br&gt;
-　　因为太过温馨和纯净，真实也显得虚假；因为太过残酷和伤感，故事也显得真实。当山田一遍又一遍地说着我喜欢你，当真山一次又一次抱紧理花，当森田暴走的神经突然在飘雪的窗前沉静，当竹本骑着已经烂掉的自行车说我回来了，当花本作出了惊人的选择，当竹本抱着四叶草面包独自哭泣，这一切近乎梦境，又那么真实。生活是没有主角的，没有任何一个受到主角光环照耀的人，没有不死的、不败的、不变的，有的只是“&lt;a href=&#34;/2006/10/honey-and-clover-second-season/&#34;&gt;选择为了自己心中最重要的事物，而交出整个人生的权利&lt;/a&gt;”&lt;/p&gt;
+　　因为太过温馨和纯净，真实也显得虚假；因为太过残酷和伤感，故事也显得真实。当山田一遍又一遍地说着我喜欢你，当真山一次又一次抱紧理花，当森田暴走的神经突然在飘雪的窗前沉静，当竹本骑着已经烂掉的自行车说我回来了，当花本作出了惊人的选择，当竹本抱着四叶草面包独自哭泣，这一切近乎梦境，又那么真实。生活是没有主角的，没有任何一个受到主角光环照耀的人，没有不死的、不败的、不变的，有的只是“&lt;a href=&#34;https://blog.williamgates.net/2006/10/honey-and-clover-second-season/&#34;&gt;选择为了自己心中最重要的事物，而交出整个人生的权利&lt;/a&gt;”&lt;/p&gt;
 &lt;p&gt;　　九、交响诗篇（动画2006完结）&lt;br&gt;
 　　过多的隐喻、庞大的世界设定并非完美无缺，少年成长的传统剧情也不是很有新意，但是这部作品做得最好的就是说故事的能力，正如其名，整个故事如同气势磅礴的交响诗，从世界的眼光来看人而不是从人的眼光来看世界，每个人物都有独特的故事，并非简单的少年升级记，而是有着群像般的饱满故事。比起注重天生的救世主能力或者无限的精神力的常见萝卜剧，这个故事可谓视角独特，说得精彩。&lt;br&gt;
 　　不过最感动我的部分倒不是剧情，也不是无敌变身的结尾，而是当所有人绑好安全带，机头缓缓拉起，耳机里音乐打碟模仿着打不着的发动机，突然流畅的音乐喷薄而出，眼前的云层猛然消失，只有耀眼的阳光灼烧着眼睛的时候，我们仿佛也感觉到了那巨大的加速度，亲身体验到兰顿和霍兰德们对天空的渴望和热爱。&lt;/p&gt;
 &lt;p&gt;　　十、秒速五厘米（2007）及新海诚其他作品&lt;br&gt;
 　　动人一刻带给你的未必是心动，也可能是心碎。“你创造的星海中的故事，用无法逾越的距离来告诉我们心灵的距离可以超越空间的隔阂，自始至终，我们看到的都是相信，都是坚持，都是跨越那无尽距离的努力；你演绎的云端的传奇，让我们看到了为了约定而跨越不可能的少年豪情，我们还是看到了相信，坚持，和跨越世界的鸿沟的努力。悲剧也好团圆也好，分离也好拥抱也好，你给我们的总是两个字，希望。”&lt;br&gt;
 　　“但是现在，你竟然要用你的作品来展现那现实的残酷——不在于失败，错过或者颓废，而在于无奈，放弃和绝望。”“但我总觉得，动漫应该是我们的梦，应该是青春的梦想。纵使不能实现，它也应该是引领我们做梦的精灵，而不是唤醒我们梦想的闹钟。”&lt;br&gt;
-　　&lt;a href=&#34;/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/&#34;&gt;这是我看过秒速5后写下的&lt;/a&gt;，听着主题歌，痛哭流涕。的确存在刻意的催泪、虐心作品，的确存在刻意描绘普通人不能抵抗世界的生活故事，但是将这样的故事用我们所爱的动漫来讲述，由新海诚来讲述，未免过于残酷。因为故事太过真实，因为叙事太过优秀，因为那淡淡的哀伤太过甜美而绝望，这部戏是我最无法接受却也最喜欢的ACG作品之一。&lt;br&gt;
+　　&lt;a href=&#34;https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/&#34;&gt;这是我看过秒速5后写下的&lt;/a&gt;，听着主题歌，痛哭流涕。的确存在刻意的催泪、虐心作品，的确存在刻意描绘普通人不能抵抗世界的生活故事，但是将这样的故事用我们所爱的动漫来讲述，由新海诚来讲述，未免过于残酷。因为故事太过真实，因为叙事太过优秀，因为那淡淡的哀伤太过甜美而绝望，这部戏是我最无法接受却也最喜欢的ACG作品之一。&lt;br&gt;
 　　“若是一切可以重来/那我一定会赶到你身边/我已然别无所求/你才是我最重要的唯一”。似乎这又是一个关于放弃和选择的爱情故事，只不过选择的不是童话，放弃的不是正常生活，但是为什么每次听到这首歌，都赶到无以名状的痛苦呢。&lt;/p&gt;
 &lt;p&gt;　　十年十选，只不过是自己体验过的极少作品中的极少部分。我不想推荐什么，我只是记录下ACG带给我的心灵旅程。谢谢你们，整日研究如果赚宅男更多钱的ACG业者们，谢谢你们给了我们，一段段精彩的梦。&lt;/p&gt;
 
@@ -441,7 +441,7 @@
 　　“我曾经问个不休/你何时跟我走/可你却总是笑我/一无所有/我要给你我的追求/还有我的自由/可你却总是笑我/一无所有”，我看完这部漫画，不知为什么就想到了这首歌。是啊，我一无所有，为什么你还要飞跃半个地球来追寻？是啊，我一无所有，因为我把所有的人生都投注在了对一个人的执着。小林尽在后记中说“把自己的一直贯彻到最后是很重要的，如果要谈恋爱，就要拿出这种干劲。这部作品就是要表达出这种想法。”我们是不是可以这样理解，作者要说的意思就是，虽然未必有好的结果，虽然必然要面对失败，但是青春就是顽固到愚蠢的执着，青春就是永不言败的勇气，青春的意义就在于敢于笑着说我一无所有——然后踏上下一次的旅程。&lt;/p&gt;
 &lt;p&gt;　　这个圣诞夜，动漫群的朋友们大多过得比较冷清。当我一个人回到家煮饺子吃饭的时候，不禁有些感伤。仔细一想，那些一起搞活动、一起吃饭、一起唱歌的朋友们，很多已经离开南京，遍布天涯海角，想要组织一次团吃都那么困难。但是青春就是充满了离别和感伤，也充满了回忆和对未来的向往——我们都还年轻，我们都可以笑着说，我们一无所有。&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/school-rumble-youth-is-fighting-for-nothing.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/school-rumble-youth-is-fighting-for-nothing.jpg&#34; 
     alt=&#34;school-rumble-youth-is-fighting-for-nothing&#34; 
      
     width=490 
@@ -458,7 +458,7 @@
     <guid>https://blog.williamgates.net/post/2008-12-21-happy-ending-of-first-love-or-keep-it-as-memory/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-01.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-01.jpg&#34; 
     alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-01&#34; 
      
     width=500 
@@ -519,7 +519,7 @@
     <guid>https://blog.williamgates.net/post/2008-11-18-school-rumble-the-tragicomedy-of-our-youth/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/school-rumble-the-tragicomedy-of-our-youth.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/school-rumble-the-tragicomedy-of-our-youth.jpg&#34; 
     alt=&#34;school-rumble-the-tragicomedy-of-our-youth&#34; 
      
     width=500 
@@ -567,7 +567,7 @@
     <guid>https://blog.williamgates.net/post/2008-02-05-like-a-rolling-rock-as-early-as-possible/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/like-a-rolling-rock-as-early-as-possible.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/like-a-rolling-rock-as-early-as-possible.jpg&#34; 
     alt=&#34;like-a-rolling-rock-as-early-as-possible&#34; 
      
     width=500 
@@ -604,7 +604,7 @@
     <guid>https://blog.williamgates.net/post/2007-08-16-goodbye-harrypotter/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/goodbye-harrypotter.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/goodbye-harrypotter.jpg&#34; 
     alt=&#34;goodbye-harrypotter&#34; 
      
     width=350 
@@ -632,7 +632,7 @@
     <guid>https://blog.williamgates.net/post/2007-03-26-eureka-meets-no-loneliness/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/eureka-meets-no-loneliness.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/eureka-meets-no-loneliness.jpg&#34; 
     alt=&#34;eureka-meets-no-loneliness&#34; 
      
     width=500 
@@ -669,7 +669,7 @@
     <guid>https://blog.williamgates.net/post/2007-03-08-lao-lang-your-song-our-youth/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/lao-lang-your-song-our-youth.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/lao-lang-your-song-our-youth.jpg&#34; 
     alt=&#34;lao-lang-your-song-our-youth&#34; 
      
     width=500 
@@ -694,7 +694,7 @@
     <guid>https://blog.williamgates.net/post/2007-02-11-goodbye-lenin/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/goodbye-lenin.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/goodbye-lenin.jpg&#34; 
     alt=&#34;goodbye-lenin&#34; 
      
     width=566 
@@ -745,7 +745,7 @@
 &lt;p&gt;　　“物质能否生灭？宇宙是否有极限？一万年以后还会有争论。正确的答案只有一个。未来的自然科学不是满足于各分支学科自成体系的自恰性，而是要求在综合之后仍能自恰。科学在争论中前进。”不知为什么，每次读到这段话，都有一种荡气回肠的感觉。她写尽了一位以教书育人为毕生己任的老人，穷尽大半生，与主流大爆炸理论相争论，不为人所认可，却又从不低头的辛酸故事。&lt;/p&gt;
 &lt;p&gt;　　最后，我愿以潘老的全书后记来结束本文.&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/conscience-of-the-society.gif&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/conscience-of-the-society.gif&#34; 
     alt=&#34;conscience-of-the-society&#34; 
      
     width=599 
@@ -861,7 +861,7 @@
     <guid>https://blog.williamgates.net/post/2006-10-23-honey-and-clover-second-season/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/honey-and-clover-second-season.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/honey-and-clover-second-season.jpg&#34; 
     alt=&#34;honey-and-clover-second-season&#34; 
      
     width=1024 
@@ -901,25 +901,25 @@
     <guid>https://blog.williamgates.net/post/2006-07-10-the-whole-world-is-looking-at-you/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-01.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/the-whole-world-is-looking-at-you-01.jpg&#34; 
     alt=&#34;the-whole-world-is-looking-at-you&#34; 
      
     width=480 
     height=&#34;375&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-02.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/the-whole-world-is-looking-at-you-02.jpg&#34; 
     alt=&#34;the-whole-world-is-looking-at-you&#34; 
      
     width=480 
     height=&#34;324&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-03.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/the-whole-world-is-looking-at-you-03.jpg&#34; 
     alt=&#34;the-whole-world-is-looking-at-you&#34; 
      
     width=283 
     height=&#34;400&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-04.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/the-whole-world-is-looking-at-you-04.jpg&#34; 
     alt=&#34;the-whole-world-is-looking-at-you&#34; 
      
     width=480 
@@ -953,7 +953,7 @@
     <description>
         &lt;p&gt;　　看完了I&#39;&#39;S的漫画，很后悔自己现在才看到这么优秀的作品，又有些庆幸，在看这部作品之前，看了草莓100%，否则对比看来，可能连看完草莓的兴致都没有了。&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-01.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/i-s-the-miracle-the-fairy-tale-01.jpg&#34; 
     alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
      
     width=385 
@@ -964,25 +964,25 @@
 　　自己所爱的人在前途最光明的时候放弃了自己的理想，因为她明白她所爱的人，有着更伟大的理想——永远和她在一起。&lt;/p&gt;
 &lt;!--description--&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-02.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/i-s-the-miracle-the-fairy-tale-02.jpg&#34; 
     alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
      
     width=317 
     height=&#34;235&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-03.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/i-s-the-miracle-the-fairy-tale-03.jpg&#34; 
     alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
      
     width=701 
     height=&#34;533&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-04.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/i-s-the-miracle-the-fairy-tale-04.jpg&#34; 
     alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
      
     width=259 
     height=&#34;391&#34;  /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-05.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/i-s-the-miracle-the-fairy-tale-05.jpg&#34; 
     alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
      
     width=538 
@@ -1011,7 +1011,7 @@
     <guid>https://blog.williamgates.net/post/2006-01-16-photostudio-in-august/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/photostudio-in-august.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/photostudio-in-august.jpg&#34; 
     alt=&#34;photostudio-in-august&#34; 
      
     width=399 
@@ -1067,7 +1067,7 @@
     <guid>https://blog.williamgates.net/post/2006-01-11-narcissu-time-goes-on/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/narcissu-time-goes-on.jpg&#34; 
+    src=&#34;https://blog.williamgates.net/assets/img/narcissu-time-goes-on.jpg&#34; 
     alt=&#34;narcissu-time-goes-on&#34; 
      
     width=500 

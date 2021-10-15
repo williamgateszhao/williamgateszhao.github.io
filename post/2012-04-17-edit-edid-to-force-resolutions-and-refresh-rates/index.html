@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题 | WilliamGates&#39; Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="WilliamGates&#39; Blog" />
+    <meta property="og:title" content="自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题 | WilliamGates&#39; Blog"/>
+    <meta itemprop="name" content="自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题 | WilliamGates&#39; Blog" />
+    <meta name="twitter:title" content="自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题 | WilliamGates&#39; Blog" />
+    <meta name="application-name" content="自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题 | WilliamGates&#39; Blog" />
+
+
+    <meta name="description" content="" />
+    <meta name="twitter:description" content=""/>
+    <meta itemprop="description" content=""/>
+    <meta property="og:description" content="" />
+
+    
+
+<meta property="og:type" content="article" />
+<meta property="article:publisher" content="William Gates" />
+<meta property="og:article:published_time" content=2012-04-17T00:33:21Z />
+<meta property="article:published_time" content=2012-04-17T00:33:21Z />
+
+
+
+
+
+<script defer type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题",
+    "author": {
+      "@type": "Person",
+      "name": "William Gates"
+    },
+    "datePublished": "2012-04-17",
+    "description": "",
+    "wordCount":  1973 ,
+    "mainEntityOfPage": "True",
+    "dateModified": "2012-04-17",
+    "publisher": {
+      "@type": "Organization",
+      "name": "William Gates",
+      "logo": {
+        "@type": "imageObject",
+        "url": "https:\/\/blog.williamgates.net\/favicon.ico"
+      }
+    }
+  }
+</script>
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    <script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                    WilliamGates&#39; Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/about/">About</a>
+                
+                <a href="/links/">Links</a>
+                
+                <a href="/posts/">Posts</a>
+                
+                <button id="dark-mode-button">
+                  <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                  <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                </button>
+            </div>
+            </div>
+    </div>
+</nav>
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                              
+                            
+                            By William Gates | <time>April 17, 2012</time>
+                            | 4 minutes
+                        </div>
+                        <div class="tags">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p>　　当windows系统（本文以win7为例）通过数字方式（HDMI或DVI）连接显示器/电视机时，会通过显卡驱动读取<a href="http://zh.wikipedia.org/zh/EDID">EDID</a>数据，该数据会告知系统该显示设备的最佳及支持的分辨率和刷新率。<br>
+　　如果这个值正确，那么一切正常，糟糕的是有时候这个值并不正确……我买了一台<a href="http://www.360buy.com/product/481852.html">康佳LED32E320PD</a>，国产电视再一次向我证明了国货是没有下限的……该电视通过HDMI连接电脑后，自动的分辨率是——1360x768@6Hz。我没打错，1360，以及6Hz。<br>
+　　而它的说明书上，清清楚楚地写着最佳分辨率1366x768@60Hz。</p>
+<!--description-->
+<p>　　我想，一定是小工在刷EEPROM的时候填错了……而且所有可选的分辨率中，就是没有1366或1360x768，你只能等待接上线的时候自动变为这个分辨率，而忍受6Hz的刷新率。<br>
+　　也就是说，本文所述的方法旨在解决<strong>显示器/电视机内置EDID数据错误或显卡读取EDID错误的情况下</strong>，如何以设计的最佳分辨率和刷新率使用该显示器/电视机来连接电脑。理论上来说本文也可用于强制让显示器运行于超出设计标准的分辨率和刷新率，比如很多人就用来修改CRT的刷新率使之支持120Hz并用于3D显示；但是这一行为具有相当的危险性，本文不予推荐，也未予测试。<br>
+　　为了解决这个问题，我想到的方案是<strong>强制电脑不使用显示器报告的EDID</strong>，而使用自定义的分辨率和刷新率。但是虽然很多人说ATI和NV的最新驱动支持彻底的自定义分辨率，我却始终没有找到（Intel似乎可以），于是我就想<strong>覆盖掉显示器报告的EDID数据</strong>。我首先尝试了<a href="http://msdn.microsoft.com/en-us/windows/hardware/gg487330">微软的这套说法</a>，后来的事实证明它未必错，但在没有软件帮助的情况下自制inf或者修改注册表都太过复杂了（你没法自己算出合适的EDID值，而且你用下文的方法修改成功后会发现，自己改注册表也是非常困难的，微软的这篇文章里对注册表的描述过于模糊），于是我找到了<a href="http://www.sevenforums.com/tutorials/7947-force-dvi-hdmi-resolutions-refresh-rates.html">这个帖子</a>，经我翻译和简化，方法如下：</p>
+<ol>
+<li>使用DVI/HDMI连接上你所要修改的显示器，确保在电脑上显示为“即插即用监视器”或具体型号的显示器，即系统识别并自动安装了驱动</li>
+<li>下载Phoenix EDID Designer，我不知道官网在哪里，请自行搜索</li>
+<li>运行之，点击Tools-Extract Registy EDID，选择你想修改的那个显示器</li>
+<li>点击File-Read Only，把钩去掉，不要乱动其他的数据，在Detailed Timings中修改默认分辨率/刷新率，但这里需要填pixel clk，这个决定了刷新率但并不等于刷新率，似乎也没有明确的工业标准（网上有人在1366x768下填了84.75、85.86，我填了85.5，都可以产生60Hz的后果），你只能根据原值与原刷新率的比例来猜测一下，并且到下一个软件中去验证。顺便一说康佳居然在这里填了两个分辨率，到底是想干啥……</li>
+<li>如果你的默认分辨率/刷新率正确，只是想添加或修改一个其他分辨率选项，又或者默认分辨率/刷新率错误，但你实在不敢乱写pixel clk，那么在Standard Timings里修改或新增一个分辨率/刷新率组合，这里可以直接填刷新率，但是分辨率只能填宽度和比例，宽度也必须取一些特定数值（我填入1366是不行的，会自动变为1360，怀疑康佳的小工就是在这里犯的错误），从1360-1370中只有1360和1368两个值可用，这就不如Detailed Timings自由。</li>
+<li>将修改后的EDID文件保存，并下载moninfo.exe（同样请自己搜索，我找到一个绿色版，但大多似乎需要安装）来打开保存的EDID文件</li>
+<li>打开如果没有提示数据出错，那么检查软件显示出的分辨率/刷新率数据是否你所希望修改的，前面提到Detailed Timings中pixel clk不知道对不对，就是到这里来验证</li>
+<li>如果都正确，那么点击Create INF来生成一个inf文件</li>
+<li>打开设备管理器，更新该显示器的驱动（可以通过硬件ID来判断哪个是你想要修改的显示器），选择从磁盘安装（如果选择搜索相应目录的话会提示你已经安装了最合适的驱动，所以必须从磁盘安装），选取刚才生成的inf文件</li>
+<li>然后……就好了。有人说重启后或重连后需要重装驱动，经我实验似乎不存在这个问题。</li>
+</ol>
+<p>　　再次提醒，如果想把这个方法用于超频显示器，后果自负。顺便吐槽一下中文的技术论坛和帖子，里面似乎懂的人/似乎做成功的人，只字不提具体方法，都是说“用那个inf的方法”之流；不懂的人胡说八道，却装得亲自试验过一般。我从CDMA手机的GPS问题开始就彻底不信任中文的技术帖子（他们认为星图文件的更新服务器选&quot;us&quot;还是&quot;cn&quot;对GPS性能有根本影响，而经我测试两个选项下到的数据完全一样，MD5都一样）<strong>绝大多数中文的技术论坛上不成完整教程的短篇文字都是胡扯，要么是胡编，要么没有经过原理分析，几乎和跳大神一样，以心理作用代替实验结果</strong>。</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/post/2010-12-14-top-10-acgs-of-10-years/" title="Previous post (older)">
+            <span>Previous</span>
+            十年十选——ACG动人一刻
+            </a>
+        
+        
+        
+        <a rel="next" href="/post/2013-02-23-gaeproxy-analysis/" title="Next post (newer)">
+            <span>Next</span>
+            （新版）对gaeproxy的“https代理”功能之分析和说明
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.c81551cd4dbef120af278f16966a41142c02be9ff5d6a669be09820fbf047456.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
