@@ -1,1 +1,0 @@
-# WilliamGates' Blog
