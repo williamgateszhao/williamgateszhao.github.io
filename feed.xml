@@ -5,13 +5,13 @@
     <description>Recent content on WilliamGates&#39; Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 19 May 2014 21:55:50 +0000</lastBuildDate><atom:link href="https://blog.williamgates.net/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 15 Oct 2021 05:50:00 +0000</lastBuildDate><atom:link href="https://blog.williamgates.net/index.xml" rel="self" type="application/rss+xml" />
     <item>
     <title>请你勇敢地伸出手</title>
-    <link>https://blog.williamgates.net/post/2014-05-19-fight_for_happiness/</link>
+    <link>https://blog.williamgates.net/2014/05/fight_for_happiness/</link>
     <pubDate>Mon, 19 May 2014 21:55:50 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2014-05-19-fight_for_happiness/</guid>
+    <guid>https://blog.williamgates.net/2014/05/fight_for_happiness/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/fight_for_happiness.png&#34; 
@@ -53,10 +53,10 @@
     
     <item>
     <title>不再依赖Google Reader的Kindle Reader</title>
-    <link>https://blog.williamgates.net/post/2013-04-16-kindle-reader-without-google-reader/</link>
+    <link>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</link>
     <pubDate>Tue, 16 Apr 2013 11:05:15 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2013-04-16-kindle-reader-without-google-reader/</guid>
+    <guid>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</guid>
     <description>
         &lt;p&gt;　　&lt;a href=&#34;https://github.com/jiedan/kindlereader/&#34;&gt;Kindle Reader&lt;/a&gt;是一个自动将Google Reader内容生成mobi文件并通过邮件发送至kindle的工具，由&lt;a href=&#34;https://github.com/jiedan&#34;&gt;jieban&lt;/a&gt;开发。由于Google Reader即将关闭，所以我对其进行了一些修改，让程序从配置文件读取RSS地址并直接访问内容，不通过Google Reader的API，从而不再依赖Google的服务。&lt;br&gt;
 　　感谢&lt;a href=&#34;https://github.com/jiedan&#34;&gt;jieban&lt;/a&gt;迅速接受了我的Pull Request，本文中的程序已经被合并到主分支。欢迎有兴趣的朋友到Github的&lt;a href=&#34;https://github.com/jiedan/kindlereader&#34;&gt;Kindle Reader项目&lt;/a&gt;去观看代码并给出意见（&lt;a href=&#34;https://github.com/williamgateszhao/kindlereader/&#34;&gt;本人fork出来的repository在此&lt;/a&gt;）。&lt;br&gt;
@@ -258,10 +258,10 @@
     
     <item>
     <title>（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任</title>
-    <link>https://blog.williamgates.net/post/2013-02-24-gaeproxy-analysis-deprecated/</link>
+    <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</link>
     <pubDate>Sun, 24 Feb 2013 23:03:50 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2013-02-24-gaeproxy-analysis-deprecated/</guid>
+    <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</guid>
     <description>
         &lt;ul&gt;
 &lt;li&gt;该文中描述的原理仍然有效，而gaeproxy的作者已经在项目主页、官方twitter帐号上明确说明了存在这种情况，故“作者未对公众说明”已经不存在了。&lt;/li&gt;
@@ -299,10 +299,10 @@
     
     <item>
     <title>（新版）对gaeproxy的“https代理”功能之分析和说明</title>
-    <link>https://blog.williamgates.net/post/2013-02-23-gaeproxy-analysis/</link>
+    <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</link>
     <pubDate>Sat, 23 Feb 2013 16:39:50 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2013-02-23-gaeproxy-analysis/</guid>
+    <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</guid>
     <description>
         &lt;ul&gt;
 &lt;li&gt;经过我旧版文章分析后，gaeproxy的作者Max Lv很诚恳和大度地在项目主页和官方twitter帐号上解释了“https代理”功能，并将本地址作为说明放在项目主页上，故我将较为耸人听闻的旧版移至另一地址，在本地址重做了一份简单的说明。&lt;/li&gt;
@@ -340,10 +340,10 @@
     
     <item>
     <title>自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题</title>
-    <link>https://blog.williamgates.net/post/2012-04-17-edit-edid-to-force-resolutions-and-refresh-rates/</link>
+    <link>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</link>
     <pubDate>Tue, 17 Apr 2012 00:33:21 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2012-04-17-edit-edid-to-force-resolutions-and-refresh-rates/</guid>
+    <guid>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</guid>
     <description>
         &lt;p&gt;　　当windows系统（本文以win7为例）通过数字方式（HDMI或DVI）连接显示器/电视机时，会通过显卡驱动读取&lt;a href=&#34;http://zh.wikipedia.org/zh/EDID&#34;&gt;EDID&lt;/a&gt;数据，该数据会告知系统该显示设备的最佳及支持的分辨率和刷新率。&lt;br&gt;
 　　如果这个值正确，那么一切正常，糟糕的是有时候这个值并不正确……我买了一台&lt;a href=&#34;http://www.360buy.com/product/481852.html&#34;&gt;康佳LED32E320PD&lt;/a&gt;，国产电视再一次向我证明了国货是没有下限的……该电视通过HDMI连接电脑后，自动的分辨率是——1360x768@6Hz。我没打错，1360，以及6Hz。&lt;br&gt;
@@ -371,10 +371,10 @@
     
     <item>
     <title>十年十选——ACG动人一刻</title>
-    <link>https://blog.williamgates.net/post/2010-12-14-top-10-acgs-of-10-years/</link>
+    <link>https://blog.williamgates.net/2010/12/top-10-acgs-of-10-years/</link>
     <pubDate>Tue, 14 Dec 2010 15:17:25 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2010-12-14-top-10-acgs-of-10-years/</guid>
+    <guid>https://blog.williamgates.net/2010/12/top-10-acgs-of-10-years/</guid>
     <description>
         &lt;p&gt;　　迫于百合C版的自发十年总结风潮，我也决定来写一个十年十大最动人ACG作品。不用说，是用我个人（怪异的）标准，以我个人接触过（极少的）ACG作品为范围，非常不权威。说到底我只不过是被勾起了兴趣，自己想写而已。文字对于很多人来说是记录回忆的过程，对我来说，本身就是产生感动和回忆的手段。&lt;br&gt;
 　　说是动人一刻，更准确的说是有动人一刻的作品，因为我不想明确地评选十大镜头；说是动人，并不一定是萌、燃或者感动，只是“心头一动”的感觉。排名不分先后（尽量按从旧到新排列），有不同意见，欢迎吐槽，不接受拍砖。&lt;/p&gt;
@@ -425,10 +425,10 @@
     
     <item>
     <title>笑着说我一无所有——再看School Rumble</title>
-    <link>https://blog.williamgates.net/post/2009-12-24-school-rumble-youth-is-fighting-for-nothing/</link>
+    <link>https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/</link>
     <pubDate>Thu, 24 Dec 2009 22:50:16 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2009-12-24-school-rumble-youth-is-fighting-for-nothing/</guid>
+    <guid>https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/</guid>
     <description>
         &lt;p&gt;　　在圣诞夜，终于看完了School Rumble的漫画。再一次投身2-C，再一次回到那喧嚣的校园，再一次，为我们共同存在于纸上的青春，泪流满面。&lt;/p&gt;
 &lt;p&gt;　　这一次我不会再说什么小林尽该死了，我不会再觉得结局有多么牵强——动画缺失的那一段，正好是小林尽为了这个结局而一步步埋下伏笔、一点点安排过渡的过程。我不会觉得乌丸多么的单薄、无力，而是能够理解他心中的执着与伤痛；我不会觉得天满有多么阴险，而是明白了她将自己的一切投入到对一个人的爱之上的决绝。看完了漫画后，会觉得结局根本就是顺理成章——对于荒腔走板的整部恶搞作品来说，结局诚意得令人感动——这根本不是什么腰斩结尾，而是实实在在用人物和故事安排出来的、几乎没可能逃避的命运。&lt;br&gt;
@@ -452,10 +452,10 @@
     
     <item>
     <title>秒速5厘米：飞向云端的初恋，随风飘落的初恋，你选哪一个？</title>
-    <link>https://blog.williamgates.net/post/2008-12-21-happy-ending-of-first-love-or-keep-it-as-memory/</link>
+    <link>https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</link>
     <pubDate>Sun, 21 Dec 2008 00:01:03 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2008-12-21-happy-ending-of-first-love-or-keep-it-as-memory/</guid>
+    <guid>https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-01.jpg&#34; 
@@ -513,10 +513,10 @@
     
     <item>
     <title>School Rumble，用喜剧纪念青春</title>
-    <link>https://blog.williamgates.net/post/2008-11-18-school-rumble-the-tragicomedy-of-our-youth/</link>
+    <link>https://blog.williamgates.net/2008/11/school-rumble-the-tragicomedy-of-our-youth/</link>
     <pubDate>Tue, 18 Nov 2008 23:25:37 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2008-11-18-school-rumble-the-tragicomedy-of-our-youth/</guid>
+    <guid>https://blog.williamgates.net/2008/11/school-rumble-the-tragicomedy-of-our-youth/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/school-rumble-the-tragicomedy-of-our-youth.jpg&#34; 
@@ -561,10 +561,10 @@
     
     <item>
     <title>趁年轻，赶紧摇</title>
-    <link>https://blog.williamgates.net/post/2008-02-05-like-a-rolling-rock-as-early-as-possible/</link>
+    <link>https://blog.williamgates.net/2008/02/like-a-rolling-rock-as-early-as-possible/</link>
     <pubDate>Tue, 05 Feb 2008 23:03:33 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2008-02-05-like-a-rolling-rock-as-early-as-possible/</guid>
+    <guid>https://blog.williamgates.net/2008/02/like-a-rolling-rock-as-early-as-possible/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/like-a-rolling-rock-as-early-as-possible.jpg&#34; 
@@ -598,10 +598,10 @@
     
     <item>
     <title>再见哈利波特，再见我们的童年</title>
-    <link>https://blog.williamgates.net/post/2007-08-16-goodbye-harrypotter/</link>
+    <link>https://blog.williamgates.net/2007/08/goodbye-harrypotter/</link>
     <pubDate>Thu, 16 Aug 2007 20:30:50 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2007-08-16-goodbye-harrypotter/</guid>
+    <guid>https://blog.williamgates.net/2007/08/goodbye-harrypotter/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/goodbye-harrypotter.jpg&#34; 
@@ -626,10 +626,10 @@
     
     <item>
     <title>Eureka——交响诗中，没有孤独</title>
-    <link>https://blog.williamgates.net/post/2007-03-26-eureka-meets-no-loneliness/</link>
+    <link>https://blog.williamgates.net/2007/03/eureka-meets-no-loneliness/</link>
     <pubDate>Mon, 26 Mar 2007 21:06:50 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2007-03-26-eureka-meets-no-loneliness/</guid>
+    <guid>https://blog.williamgates.net/2007/03/eureka-meets-no-loneliness/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/eureka-meets-no-loneliness.jpg&#34; 
@@ -663,10 +663,10 @@
     
     <item>
     <title>老狼老了，青春还在</title>
-    <link>https://blog.williamgates.net/post/2007-03-08-lao-lang-your-song-our-youth/</link>
+    <link>https://blog.williamgates.net/2007/03/lao-lang-your-song-our-youth/</link>
     <pubDate>Thu, 08 Mar 2007 22:31:33 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2007-03-08-lao-lang-your-song-our-youth/</guid>
+    <guid>https://blog.williamgates.net/2007/03/lao-lang-your-song-our-youth/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/lao-lang-your-song-our-youth.jpg&#34; 
@@ -688,10 +688,10 @@
     
     <item>
     <title>再见列宁</title>
-    <link>https://blog.williamgates.net/post/2007-02-11-goodbye-lenin/</link>
+    <link>https://blog.williamgates.net/2007/02/goodbye-lenin/</link>
     <pubDate>Sun, 11 Feb 2007 17:19:38 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2007-02-11-goodbye-lenin/</guid>
+    <guid>https://blog.williamgates.net/2007/02/goodbye-lenin/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/goodbye-lenin.jpg&#34; 
@@ -720,10 +720,10 @@
     
     <item>
     <title>社会的良心——听潘根老师讲座有感</title>
-    <link>https://blog.williamgates.net/post/2006-12-21-conscience-of-the-society/</link>
+    <link>https://blog.williamgates.net/2006/12/conscience-of-the-society/</link>
     <pubDate>Thu, 21 Dec 2006 22:35:35 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-12-21-conscience-of-the-society/</guid>
+    <guid>https://blog.williamgates.net/2006/12/conscience-of-the-society/</guid>
     <description>
         &lt;p&gt;　　曾经听说“知识分子是社会的良心”，颇不以为然，觉得知识分子做好本职工作即可，除非是社会学、政治学家，否则颇不必为“社会良知”“重视教育”之类的事情走与呼。但前日听得潘根老师一席讲座，虽时间不长、所言具体内容有限，却受益良多，方才懂“社会的良心”的涵义。&lt;br&gt;
 　　潘老师所讲的，是宇宙学的争论，从宇宙学的一些基本事实，讲到历史上的几个主要理论和模型，再谈到关于大爆炸假说的争论，所涉主题虽颇有专业，但讲解深入浅出，毫无跳跃、矛盾之处，让我这个文科生也能顺利理解。&lt;br&gt;
@@ -756,10 +756,10 @@
     
     <item>
     <title>光芒还是灰烬？——读余杰《我的梦想在燃烧》</title>
-    <link>https://blog.williamgates.net/post/2006-12-08-my-dream-is-burning/</link>
+    <link>https://blog.williamgates.net/2006/12/my-dream-is-burning/</link>
     <pubDate>Fri, 08 Dec 2006 01:35:35 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-12-08-my-dream-is-burning/</guid>
+    <guid>https://blog.williamgates.net/2006/12/my-dream-is-burning/</guid>
     <description>
         &lt;p&gt;　　作为一个毫不害怕承认自己曾经是愤青的人，我一直非常想读余杰的书，毕竟他曾经号称是中国当代热血青年的领军人物，虽然他也许并不齿这类称号。但不知什么原因，直到我过了20岁，已经不在那么坚定的相信民族主义或者自由主义那一套，也就是说我不再那么右也不在那么左，不再那么愤世嫉俗的时候，我突然捧起了他的书，并且只用了三天就看完了一本。&lt;br&gt;
 　　读着读着，我总觉得与我记忆中，概念中的那个余杰，有些不一样。一方面，他的评论确实犀利，他的眼光确实独到，他的价值观的确特立独行，但我总觉得缺了点什么，缺了点让一个杂文家之所以伟大的东西；一方面，他的意识形态明显的美国化，他对基督教文明的崇拜，却又没有详细的理论解释他为什么崇拜这种信仰，不由得让人觉得有点不快。&lt;br&gt;
@@ -776,10 +776,10 @@
     
     <item>
     <title>谁来教我们法哲学？——读林立《法学方法论与德沃金》</title>
-    <link>https://blog.williamgates.net/post/2006-12-07-dworkin-the-methodology-of-law/</link>
+    <link>https://blog.williamgates.net/2006/12/dworkin-the-methodology-of-law/</link>
     <pubDate>Thu, 07 Dec 2006 22:15:09 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-12-07-dworkin-the-methodology-of-law/</guid>
+    <guid>https://blog.williamgates.net/2006/12/dworkin-the-methodology-of-law/</guid>
     <description>
         &lt;p&gt;　　读完了林立先生的《法学方法论与德沃金》，虽未能全然理解其思想本意，也并非完全赞同其对德沃金先生的批判，但舍去具体学术问题不谈，我想到一个问题：谁来教我们法哲学？&lt;/p&gt;
 &lt;p&gt;　　作为法学专业的学生，我们大学的第一个学期就开设有法理学这门课。其出发点无疑是让我们培养起专业的法学思维方法，了解一定的法学研究方式。但综观各种法理学教材，回想当年上过的法理学课程，不由惊出一身冷汗：老师讲了多少？我们又理解了多少？&lt;br&gt;
@@ -802,10 +802,10 @@
     
     <item>
     <title>《波斯纳与法律经济分析》读后感（二）——法律经济分析的价值矛盾</title>
-    <link>https://blog.williamgates.net/post/2006-11-21-posner-law-and-economics-02/</link>
+    <link>https://blog.williamgates.net/2006/11/posner-law-and-economics-02/</link>
     <pubDate>Tue, 21 Nov 2006 16:26:27 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-11-21-posner-law-and-economics-02/</guid>
+    <guid>https://blog.williamgates.net/2006/11/posner-law-and-economics-02/</guid>
     <description>
         &lt;p&gt;　　读林立先生的书，字里行间无不充满着严谨的逻辑论证和强烈的思辨气息，例如他对波斯纳先生所倡导的理论的终极价值的评价：&lt;/p&gt;
 &lt;blockquote&gt;
@@ -826,10 +826,10 @@
     
     <item>
     <title>《波斯纳与法律经济分析》读后感（一）——实证科学不是万能的</title>
-    <link>https://blog.williamgates.net/post/2006-11-10-posner-law-and-economics-01/</link>
+    <link>https://blog.williamgates.net/2006/11/posner-law-and-economics-01/</link>
     <pubDate>Fri, 10 Nov 2006 20:32:15 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-11-10-posner-law-and-economics-01/</guid>
+    <guid>https://blog.williamgates.net/2006/11/posner-law-and-economics-01/</guid>
     <description>
         &lt;blockquote&gt;
 &lt;p&gt;有两样东西，我们愈经常持久地加以思索，它们就愈使心灵充满始终新鲜，不断增长的景仰和敬畏：&lt;br&gt;
@@ -855,10 +855,10 @@
     
     <item>
     <title>H&amp;C II——关于青春，关于成长</title>
-    <link>https://blog.williamgates.net/post/2006-10-23-honey-and-clover-second-season/</link>
+    <link>https://blog.williamgates.net/2006/10/honey-and-clover-second-season/</link>
     <pubDate>Mon, 23 Oct 2006 16:18:39 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-10-23-honey-and-clover-second-season/</guid>
+    <guid>https://blog.williamgates.net/2006/10/honey-and-clover-second-season/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/honey-and-clover-second-season.jpg&#34; 
@@ -895,10 +895,10 @@
     
     <item>
     <title>因为，全世界都在看着</title>
-    <link>https://blog.williamgates.net/post/2006-07-10-the-whole-world-is-looking-at-you/</link>
+    <link>https://blog.williamgates.net/2006/07/the-whole-world-is-looking-at-you/</link>
     <pubDate>Mon, 10 Jul 2006 15:30:05 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-07-10-the-whole-world-is-looking-at-you/</guid>
+    <guid>https://blog.williamgates.net/2006/07/the-whole-world-is-looking-at-you/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/the-whole-world-is-looking-at-you-01.jpg&#34; 
@@ -946,10 +946,10 @@
     
     <item>
     <title>I&#39;&#39;S：一个关于奇迹的童话</title>
-    <link>https://blog.williamgates.net/post/2006-04-02-i-s-the-miracle-the-fairy-tale/</link>
+    <link>https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/</link>
     <pubDate>Sun, 02 Apr 2006 00:25:51 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-04-02-i-s-the-miracle-the-fairy-tale/</guid>
+    <guid>https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/</guid>
     <description>
         &lt;p&gt;　　看完了I&#39;&#39;S的漫画，很后悔自己现在才看到这么优秀的作品，又有些庆幸，在看这部作品之前，看了草莓100%，否则对比看来，可能连看完草莓的兴致都没有了。&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
@@ -1005,10 +1005,10 @@
     
     <item>
     <title>八月照相馆——绝望中的希望，是残酷还是温暖？</title>
-    <link>https://blog.williamgates.net/post/2006-01-16-photostudio-in-august/</link>
+    <link>https://blog.williamgates.net/2006/01/photostudio-in-august/</link>
     <pubDate>Mon, 16 Jan 2006 20:55:50 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-01-16-photostudio-in-august/</guid>
+    <guid>https://blog.williamgates.net/2006/01/photostudio-in-august/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/photostudio-in-august.jpg&#34; 
@@ -1061,10 +1061,10 @@
     
     <item>
     <title>Narcissu：冰冻的时间再次开始了流动</title>
-    <link>https://blog.williamgates.net/post/2006-01-11-narcissu-time-goes-on/</link>
+    <link>https://blog.williamgates.net/2006/01/narcissu-time-goes-on/</link>
     <pubDate>Wed, 11 Jan 2006 15:50:00 +0000</pubDate>
     
-    <guid>https://blog.williamgates.net/post/2006-01-11-narcissu-time-goes-on/</guid>
+    <guid>https://blog.williamgates.net/2006/01/narcissu-time-goes-on/</guid>
     <description>
         &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
     src=&#34;/assets/img/narcissu-time-goes-on.jpg&#34; 

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="WilliamGates&#39; Blog" />
+    <meta property="og:title" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog"/>
+    <meta itemprop="name" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
+    <meta name="twitter:title" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
+    <meta name="application-name" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
+
+
+    <meta name="description" content="" />
+    <meta name="twitter:description" content=""/>
+    <meta itemprop="description" content=""/>
+    <meta property="og:description" content="" />
+
+    
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    <script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                    WilliamGates&#39; Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/about/">About</a>
+                
+                <a href="/links/">Links</a>
+                
+                <a href="/posts/">Posts</a>
+                
+                <button id="dark-mode-button">
+                  <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                  <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                </button>
+            </div>
+            </div>
+    </div>
+</nav>
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>不再依赖Google Reader的Kindle Reader</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                              
+                            
+                            By William Gates | <time>April 16, 2013</time>
+                            | 9 minutes
+                        </div>
+                        <div class="tags">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p>　　<a href="https://github.com/jiedan/kindlereader/">Kindle Reader</a>是一个自动将Google Reader内容生成mobi文件并通过邮件发送至kindle的工具，由<a href="https://github.com/jiedan">jieban</a>开发。由于Google Reader即将关闭，所以我对其进行了一些修改，让程序从配置文件读取RSS地址并直接访问内容，不通过Google Reader的API，从而不再依赖Google的服务。<br>
+　　感谢<a href="https://github.com/jiedan">jieban</a>迅速接受了我的Pull Request，本文中的程序已经被合并到主分支。欢迎有兴趣的朋友到Github的<a href="https://github.com/jiedan/kindlereader">Kindle Reader项目</a>去观看代码并给出意见（<a href="https://github.com/williamgateszhao/kindlereader/">本人fork出来的repository在此</a>）。<br>
+　　多用户版正在开发，将免费提供公开服务，不再需要用户自行运行程序，类似于狗耳朵、kindle4rss等。</p>
+<h2 id="更新历史">
+    <a href="#%e6%9b%b4%e6%96%b0%e5%8e%86%e5%8f%b2" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    更新历史
+</h2>
+<pre><code>0.6.5 修正一个当rss中author为空时的隐蔽错误；修正运行目录不能含有空格的错误；修改模板，在正文界面显示来源和作者；停止为多用户版进一步重构，代码与多用户版开始区分  
+0.6.4 修正win下的路径错误；修正目录页的内容摘要（过滤html标签）；更换BeautifulSoup版本  
+0.6.3 新增时区选项，所有可见的日期显示均根据用户选择的时区（默认为+8）；新增灰度图选项，在生成mobi前将图片转为灰度图，减小文件体积（默认关闭）；允许用户选择是否启用kindlestrip  
+0.6.2 修改mobi文件标题，现在periodical格式在原生系统能自动归档了（但两个文件为同一天的，会将较新的文件归档，目前无法解决）  
+0.6.1 修复一些问题；尝试处理一些不合规范的时间信息；在所有文章信息中均使用utc时间  
+0.6.0 对feed读取也采取了多线程，大幅度提高速度；重构代码，为开发多用户版做准备  
+0.4.9 增加强制全文输出的功能，使用fivefilters.org，为了避开该站点免费用户每次只能输出3篇文章的限制，尝试将每篇文章单独发给该站点进行解析  
+0.4.8 不再需要安装feedparser库，Python 2.7环境可以直接使用本程序  
+0.4.7 优化feed读取和图片下载流程，下载失败自动进行重试；修复了对不提供发布时间的RSS格式支持  
+0.4.6 修复了对图片URL中含有非ASCII字符的支持，并加强了下载图片的效率和适应性  
+0.4.5 修复了对不提供author或content节点的RSS格式支持  
+0.4.4 引入Kindlestrip，大幅度压缩了生成mobi文件的大小（一般小于原先的50%）;打包了exe文件，使得NoGR分支可以在windows不依赖Python环境运行，对普通用户更加友好  
+0.4.3 修复了不会自动退出的BUG;修复了对&quot;/&quot;结尾Feed地址处理的BUG  
+0.4.2 修复了某些feed地址必须以&quot;/&quot;结尾或反之所导致的问题，对feed是否读取成功进行判断  
+0.4.1 增加限制最旧文章时间的功能;修改了日期格式  
+0.4.0 it works
+</code></pre>
+<h2 id="主要功能">
+    <a href="#%e4%b8%bb%e8%a6%81%e5%8a%9f%e8%83%bd" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    主要功能
+</h2>
+<ul>
+<li>保留原有的读取内容、生成mobi文件并发送到任意邮箱的功能</li>
+<li>相比著名推送服务如kindle4rss、狗耳朵等来说，通过本程序自建服务可以让mobi包含图片，不受任何流量和频率限制</li>
+<li>不再依赖google reader提供feed地址和内容，直接从配置文件读取feed地址并访问网站获取内容</li>
+<li>通过引入<a href="http://www.mobileread.com/forums/showthread.php?t=96903">kindlestrip</a>，大幅度缩小了生成的mobi文件大小，以方便通过邮件的推送</li>
+<li>通过使用<a href="http://fivefilters.org/content-only/">fivefilters.org</a>的服务，提供对RSS强制全文输出的功能</li>
+</ul>
+<!--description-->
+<h2 id="windows用户使用方法很简单">
+    <a href="#windows%e7%94%a8%e6%88%b7%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95%e5%be%88%e7%ae%80%e5%8d%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Windows用户使用方法（很简单）
+</h2>
+<ol>
+<li>
+<p>下载最新版本的<a href="https://github.com/williamgateszhao/kindlereader/archive/v0.6.5.zip">v0.6.5</a></p>
+</li>
+<li>
+<p>解压缩后，只需保留<code>kindlereader.exe</code>和<code>config.sample.ini</code>两个文件，放在任意目录，其他文件都不需要</p>
+</li>
+<li>
+<p>如果你使用的系统是WindowsXP，那么你需要安装<a href="http://www.microsoft.com/en-us/download/details.aspx?id=29">Microsoft Visual C++ 2008 Redistributable Package</a></p>
+</li>
+<li>
+<p>将<code>config.sample.ini</code>改名为<code>config.ini</code>，并修改其中的内容，具体可以看文件中的注释，主要要改的选项是：</p>
+<pre><code> kindle_format，默认为book，如果你想要类似于狗耳朵那样的杂志形式，请改为periodical（只对官方系统有效）
+ max_items_number，每个RSS源最多读取多少篇文章，建议不要太多
+ max_image_per_article，每篇文章最多下载多少图片，由于上述的技术更新，本程序生成的文件不再动辄十几M，所以这里多一些也没问题
+ max_old_date，不读取早于N天前的文章，一般与你多少天运行一次本程序相等，以免看到重复的文章
+ mail_enable，如果需要程序自动将生成的mobi文件发送到kindle，需要将此项设为1
+ to,一般是@free.kindle.com或@iduokan.com的邮箱，根据你使用系统的不同来决定
+ username，你的邮箱（发信用，不是收信的iduokan或kindle邮箱）用户名，如果不使用gmail发信，请相应修改host、port、ssl等选项来符合你的smtp服务器（如QQ邮箱是host=smtp.qq.com,port=25,ssl=0）
+ password，你的邮箱密码，如果不愿意将主要邮箱的密码明文写在配置文件中，可以单独注册一个邮箱专门用于发送
+ feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，就写成feed1=www.guokr.com/rss/，每个feed结尾的数字不能重复，即必须是feed1、feed2、feed3这样编写下去，总量不限。如果你需要打开某个feed的强制全文输出（即原来该feed的文章只有摘要），你可以在http前面加上full，即fullhttp://www.a.com/rss/这样的。
+</code></pre>
+</li>
+<li>
+<p>下载亚马逊官方的mobi生成工具<a href="http://s3.amazonaws.com/kindlegen/kindlegen_win32_v2_8.zip">kindlegen</a>，解压后只需要<code>kindlegen.exe</code>一个文件，跟<code>kindlereader.exe</code>和<code>config.ini</code>放在同一个目录下</p>
+</li>
+<li>
+<p>运行<code>kindlereader.exe</code>之后，.mobi文件就会自动发送到你设置的邮箱，并被kindle所读取。如果你设置了不发送邮件，可以从当前目录下生成的data目录中找到两个.mobi文件，将较小的那个拷贝到kindle上也可以正常阅读。可以通过计划任务来让程序定期运行</p>
+</li>
+<li>
+<p>如果你的<code>kindlereader.exe</code>一闪而过，说明出错了，请到windows命令行下运行它来查看出错信息</p>
+</li>
+</ol>
+<h2 id="linux用户使用方法桌面用户vps用户">
+    <a href="#linux%e7%94%a8%e6%88%b7%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95%e6%a1%8c%e9%9d%a2%e7%94%a8%e6%88%b7vps%e7%94%a8%e6%88%b7" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Linux用户使用方法（桌面用户/VPS用户）
+</h2>
+<ol>
+<li>下载最新版本的<a href="https://github.com/williamgateszhao/kindlereader/archive/v0.6.5.zip">v0.6.5</a></li>
+<li>解压后，只保留<code>lib</code>目录和<code>kindlereader.py</code>和<code>config.sample.ini</code>两个文件，其他文件都不需要</li>
+<li>将<code>config.sample.ini</code>改名为<code>config.ini</code>，并修改其中的内容，请参考上一段对windows用户的解释</li>
+<li>Linux用户特有的选项：grayscale，将其设为1可以让mobi文件更小一点，效果一般，必须要安装python的pillow库</li>
+<li>尽量确保你的python版本为2.7，其他版本均未测试。如果默认版本不是2.7，最好单独安装一个，方法可以参考下一段针对虚拟主机用户的说明</li>
+<li>下载下载亚马逊官方的mobi生成工具<a href="http://s3.amazonaws.com/kindlegen/kindlegen_linux_2.6_i386_v2_8.tar.gz">kindlegen</a>，解压后只需要<code>kindlegen</code>一个文件，跟<code>kindlereader.py</code>和<code>config.ini</code>放在同一个目录下</li>
+<li>运行<code>python kindlereader.py</code>即可，可以通过crontab定期运行，脚本可以参考下一段</li>
+</ol>
+<h2 id="linux用户使用方法虚拟主机用户以hostmonster为例">
+    <a href="#linux%e7%94%a8%e6%88%b7%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95%e8%99%9a%e6%8b%9f%e4%b8%bb%e6%9c%ba%e7%94%a8%e6%88%b7%e4%bb%a5hostmonster%e4%b8%ba%e4%be%8b" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    Linux用户使用方法（虚拟主机用户，以Hostmonster为例）
+</h2>
+<ol>
+<li>
+<p>如果你的系统默认python版本就是2.7（运行python，查看显示的版本），那么使用方法完全和上面桌面/VPS用户一样</p>
+</li>
+<li>
+<p>如果你系统默认的python不是2.7版本，请按照下面的说明安装2.7版本的python</p>
+</li>
+<li>
+<p>修改<code>~/.bash_profile</code>文件，确保文件中有以下内容（如已有某行，不用再写这一行）</p>
+<pre><code> PATH=$HOME/bin:$PATH
+ LD_LIBRARY_PATH=$HOME/lib/
+ export PATH
+ export LD_LIBRARY_PATH
+</code></pre>
+</li>
+<li>
+<p>安装python</p>
+<pre><code> $ wget http://www.python.org/ftp/python/2.7.4/Python-2.7.4.tgz
+ $ tar -xvfz Python-2.7.4.tgz
+ $ cd  Python-2.7.4
+ $ ./configure --prefix $HOME
+ $ make install
+</code></pre>
+</li>
+<li>
+<p>确保<code>kindlereader.py</code>和<code>config.ini</code>、<code>kindlegen</code>和<code>lib</code>目录都存在的情况下，运行<code>~/bin/python kindlereader.py</code>即可</p>
+</li>
+<li>
+<p>可以使用脚本以便cron来运行，假设你的家目录是<code>/home1/xxx/</code>,你将<code>kindlereader.py</code>、<code>kindlegen</code>和<code>config.ini</code>存放在<code>/home1/xxx/kindle/</code>下面，那么写一个<code>kindle.sh</code>放在同一目录下</p>
+<pre><code> #!/bin/sh
+ cd /home1/xxx/kindle/
+ /home1/xxx/bin/python kindlereader.py
+</code></pre>
+</li>
+<li>
+<p>在虚拟主机控制面板里的“时钟守护作业”中填入<code>/home1/xxx/kindle/kindle.sh</code>，我选的运行频率是<code>0 15 */3 * *</code>，即每三天运行一次，在主机时间的每天15点。</p>
+</li>
+<li>
+<p>顺便可以再做一个cron任务，用于清理生成的data目录，填入<code>rm -rf /home1/xxx/kindle/data/</code>即可，频率和上面一样，但时间要推迟一点，比如<code>0 16 */3 * *</code></p>
+</li>
+</ol>
+<h2 id="常见问题">
+    <a href="#%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    常见问题
+</h2>
+<ul>
+<li>想要类似于狗耳朵那样的杂志格式？请设置config.ini里的<code>kindle_format = periodical</code>，在K4和KPW上测试无问题。如果你这样设置还是不能正常显示杂志格式，请将config.ini中的<code>kindlestrip</code>改为0试试看</li>
+<li>旧版本用户已经安装了feedparser怎么办？不影响使用，你也可以卸载掉</li>
+<li>报错找不到kindlegen？请下载对应你系统的版本并确保放在同一个目录下</li>
+<li>无法用上面的链接直接下载kindlegen？请到<a href="http://www.amazon.com/gp/feature.html?ie=UTF8&amp;docId=1000765211">这个官方页面</a>下载</li>
+<li>RSS内容/图片无法读取？多试几次，一般是网络原因，同时请确认你的RSS地址正确</li>
+<li>无法在kindle fire或非kindle设备上阅读？可能是因为去除了mobi文件中的KF8格式支持，请将config.ini中的<code>kindlestrip</code>改为0试试看</li>
+<li>订阅的feed太多，导致每次运行时间太长？请将config.ini中的<code>thread_numbers</code>改为10或更高，建议不要超过20</li>
+<li>VPS等小内存环境，运行时占用内存太多甚至导致系统出错？请将config.ini中的<code>thread_numbers</code>改为2或3</li>
+<li>如果上述解答不能解决你的问题，或者你发现BUG，或者你觉得有重要的功能需要添加，请到github上提交Issue</li>
+</ul>
+<h2 id="使用建议">
+    <a href="#%e4%bd%bf%e7%94%a8%e5%bb%ba%e8%ae%ae" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    使用建议
+</h2>
+<p>　　建议放在虚拟主机或VPS上，使得程序定期运行；建议只订阅少量的、精品的、长篇的RSS源，如果壳网、科学松鼠会、译言精选等，新闻性的内容还是更适合用手机和电脑阅读；建议更新频率不要太频繁，我自己设置是3天运行一次，这样我才不会因为积存了很多未读文件而干脆不去读；建议每个feed每次更新内容在5-10篇，总共不超过30篇为宜，过多也会造成阅读懒惰；如果有喜欢的RSS源但网站不输出全文，可以使用新增的强制全文输出功能（看上面的介绍）；如果遇到fivefilters不能解决的网站，可以考虑用yahoo pipes进行精确自定义处理。</p>
+<p>　　希望所有的kindle用户都能顺利使用本程序，享受阅读的快乐。</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/2013/02/gaeproxy-analysis-deprecated/" title="Previous post (older)">
+            <span>Previous</span>
+            （旧版）对gaeproxy的一些研究，兼谈Geek的社会责任
+            </a>
+        
+        
+        
+        <a rel="next" href="/2014/05/fight_for_happiness/" title="Next post (newer)">
+            <span>Next</span>
+            请你勇敢地伸出手
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.c81551cd4dbef120af278f16966a41142c02be9ff5d6a669be09820fbf047456.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

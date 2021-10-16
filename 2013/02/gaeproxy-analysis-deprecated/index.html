@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任 | WilliamGates&#39; Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="WilliamGates&#39; Blog" />
+    <meta property="og:title" content="（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任 | WilliamGates&#39; Blog"/>
+    <meta itemprop="name" content="（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任 | WilliamGates&#39; Blog" />
+    <meta name="twitter:title" content="（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任 | WilliamGates&#39; Blog" />
+    <meta name="application-name" content="（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任 | WilliamGates&#39; Blog" />
+
+
+    <meta name="description" content="" />
+    <meta name="twitter:description" content=""/>
+    <meta itemprop="description" content=""/>
+    <meta property="og:description" content="" />
+
+    
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    <script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                    WilliamGates&#39; Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/about/">About</a>
+                
+                <a href="/links/">Links</a>
+                
+                <a href="/posts/">Posts</a>
+                
+                <button id="dark-mode-button">
+                  <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                  <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                </button>
+            </div>
+            </div>
+    </div>
+</nav>
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                              
+                            
+                            By William Gates | <time>February 24, 2013</time>
+                            | 10 minutes
+                        </div>
+                        <div class="tags">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <ul>
+<li>该文中描述的原理仍然有效，而gaeproxy的作者已经在项目主页、官方twitter帐号上明确说明了存在这种情况，故“作者未对公众说明”已经不存在了。</li>
+<li>作者Max Lv在这件事上表现出来的诚恳和大度令人钦佩，且已经在项目主页上放上了我原文的链接，所以特将原文移动至此，原地址仅放上我对原理的解释，不再有较为激进的内容。</li>
+<li>对我的文章给作者带来的一些误解表示歉意。</li>
+</ul>
+<p>　　核心提示：gaeproxy的“https代理”功能是由作者自建服务器提供，并非通过GAE转发，打开这个选项就意味着所有的https请求都会通过第三方代理服务器；由于种种原因，很多人实际上不能正常连接goagent服务器端，但手机端看起来还可以使用，是因为这个“https代理”功能让用户通过私人VPS进行了代理访问，而这些服务器到底是谁拥有、谁运营、安全性如何，我们完全一无所知。这一切，都没有在google code或google play页面告知用户。</p>
+<p>　　<a href="https://github.com/madeye/gaeproxy">gaeproxy</a>是goagent在android上的客户端，作者是<a href="http://madeye.me/">Max Lv</a>，<a href="https://code.google.com/p/goagent/">goagent</a>在google code页面上将其作为android上使用goagent的解决方案来介绍。<br>
+　　从近期的某次升级开始，gaeproxy不再支持android 2.2系统，其项目主页上建议2.2用户使用0.19.1版。但是使用0.19.1版再也打不开“https代理”选项了，只要勾选这个选项就会一直提示gae代理启用失败；取消这个选项后，虽然显示gae代理启用成功，但任何网站（无论http还是https）都无法访问，于是我就开始了我的研究之旅：</p>
+<p>　　1、寻找官方签名版<br>
+　　通过阅读<a href="https://code.google.com/p/gaeproxy/issues/detail?id=231">Issue 231</a>，我了解到“所有第三方编译版本都无法使用 Enable HTTPS Proxy 选项”，“打开此选项后，所有 HTTPS 流量将由远程服务器转发”，为了避免中间人攻击，gaeproxy会在启用这个功能的时候验证apk的签名。<br>
+　　于是我就想下载一个官方签名版，我误以为google code上的是自动编译的版本，签名不正确，所以提交<a href="https://code.google.com/p/gaeproxy/issues/detail?id=476">Issue 476</a>，希望作者提供一个签名正确的版本，作者回应说：“官方版见 Downloads 页面，另外 HTTPS 模式已不支持 2.2 系统了，请依照 Wiki 自行导入根证书”，这时候我对后半句还不明白（看下文你就明白了），前半句倒是听懂了，google code上就是官方版，那为什么我不能打开“https代理”呢？<br>
+　　搜索后发现，其实有不少所谓“汉化去广告版”都自称可以打开“https代理”功能，又看到<a href="http://tech.yaoruisheng.com/355240.html">这篇文章（需翻越观看）</a>，了解到gaeproxy验证签名其实就是访问<a href="https://auth-gaeproxy.rhcloud.com/auth.php">https://auth-gaeproxy.rhcloud.com/auth.php</a>并提供基于时间戳和apk签名的sig，我发现这个地址已经不能访问了，而最新版代码（github上gaeproxy/src/org/gaeproxy/GAEProxyService.java）里访问的是<a href="http://myhosts.sinaapp.com/auth-4.php">http://myhosts.sinaapp.com/auth-4.php</a>。看来作者在版本更新过程中放弃了容易被墙的rhcloud，换成了sinaapp。那能不能自己编译一个版本，将代码里写死的rhcloud地址换成sinaapp的，再通过前面说的技巧骗过验证呢？<br>
+　　我尝试向作者要一个修改验证地址的0.19.1版本（<a href="https://code.google.com/p/gaeproxy/issues/detail?id=477">Issue 477</a>)，作者回应说“抱歉，0.19.1 已不支持 HTTPS 代理。解决方案：1. 升级你的 ROM 到 2.3。2. 使用伪造证书的 HTTPS 模式。”这时我对“https代理”这个功能的含义发生了怀疑——难道不是“对https流量也进行代理”的意思？经过翻阅，我终于看到了<a href="https://code.google.com/p/gaeproxy/issues/detail?id=433">Issue 433</a>，了解到了两个惊人的事实：<br>
+　　（1）作者说“gaeproxy 的 https 代理有两种模式，第一种是由本地伪造证书由GAE转发的模式，第二种是由第三方服务器透明转发的模式。未开启「HTTPS代理」选项时默认使用第一种方式。第二种方式属于私有方式，由App中的置顶广告所得提供服务器资源。第二部分的服务器代码部署在SAE上，是出于可靠性考虑，SAE 对于开源应用有资源支持，不涉及收费问题。关闭「HTTPS代理」选项后，即是由GAE转发。”<br>
+　　也就是说，“https代理”功能不是指“通过goagent代理https流量”，刚好相反，这个意思是“不通过goagent代理https流量”，而是通过第三方服务，这令人惊出一身冷汗——我们之所以信任goagent就是因为信任GAE，信任google，作者也说“所有 HTTPS 流量将由远程服务器转发，通过恶意修改这部分的代码可以轻松的获得所有经由 HTTPS 传输的敏感信息”，<strong>那我们的https访问原来一直是通过第三方代理的？作者从未明确告知过我们</strong>。<br>
+　　（2）根据作者所说，那么这个功能如果不打开，应该也能正常访问http网站；通过导入证书，更应该能访问https网站。但实际上不只是我，很多人不打开这个功能什么网站都连接不上，也有很多人打开这个功能后图片显示不出来（http访问不正常），也就说明<strong>很多人使用gaeproxy这个软件，根本只是在用作者提供的第三方代理！</strong></p>
+<!--description-->
+<p>　　2、寻找能正常连接GAE的版本<br>
+　　了解了这些事实后，我再也不敢用“https代理”这个功能了，我导入了证书，只想用正常的goagent（我承认导入证书也有风险），但是无论什么版本的gaeproxy都无法使用，软件提示gae服务已启用，系统log及SuperSU的log中也看出iptables被正确写入，redsocks正确启动，goagent的1984端口也正常打开，但就是无法连上GAE（应该是goagent客户端出了问题），也就根本没法访问任何网站（见<a href="https://code.google.com/p/gaeproxy/issues/detail?id=478">Issue 478</a>）。我也更换了不同的goagent服务器端，连古老的goagent1.8.11/gaeproxy0.16.7和goagent1.7.8/gaeproxy0.15.6这两个搭配都试过，没有一个能够使用。
+　　经过翻看代码的history，发现0.20.2的更新内容是“fix issues on Android 2.2”，奇怪，作者不是说0.19.1之后不再支持2.2么？而且0.20.1的更新还写着“update to python 2.7.2 for new goagent”，作者称python 不能用于android 2.2（未见别处有这种说法），0.20.2居然还能在android 2.2上运行？事实证明就是可以，python版本就是2.7，安装后完全正常，可以访问http/https网站。<br>
+　　这一版到底修改了什么产生了如此神奇的效果，看了代码也没明白。首先猜测是该软件一定要通过某种验证才能启用基本的功能，但该版本的验证地址虽然是sinaapp，但验证页面不对，所以也无法打开“https代理”功能，不过这个猜测至少能解释老版本goagent服务器端配老版本gaeproxy，当年能用现在却不行这一问题；另一种猜测是另有写死的地址（该作者在每一版代码中都有诸多写死的地址，甚至IP），但我简单浏览了几个版本的history，没发现关键所在；还有一种猜测是goagent客户端不使用python2.7就是不行，因为github上最早版本的goagent 1.7.8已经是python27环境了，但如果是这样，gaeproxy岂不一直只是一个第三方https代理？应该不可能。所以，这个问题有待进一步研究，可能需要作者去分析了。</p>
+<p>　　3、“https代理”功能研究<br>
+　　我虽然不敢再用这个功能，但还是进行了一下研究，发现gaeproxy的原理实际上是通过iptables将设备上所有的请求都经redsocks转发，而redsocks在http流量上使用goagent生成的代理（1984端口），在https流量上，如果你不勾选“https代理”就仍然走1984，如果勾选的话会变成gaeproxy从sinaapp那个页面取到的一个服务器，53端口的代理，是美国的某VPS。通过显示客户地址的网页（比如<a href="https://ip-lookup.net">ip-lookup.net</a>）也可以看出，打开“https代理”选项，我们的地址变成了一台VPS的地址（我测试到的是一个123systems的VPS，臭名昭著啊）。<br>
+　　据此可以了解到，作者通过这个验证页面不仅想防止中间人攻击，而且想防止他提供的免费代理被人滥用或者被封。实际上很好找——它就在redsocks.conf里面，只要你有一台2.3以上版本的设备，安装0.21.1版（0.21.2版在我的Nexus 10上无法使用，见<a href="https://code.google.com/p/gaeproxy/issues/detail?id=479">Issue 479</a>），连一次“https代理”就行了……经测试，也能用于无法打开该功能的旧版gaeproxy，但是我强烈建议不要这么做，更不推荐将其用于gaeproxy以外的地方。</p>
+<p>　　从整个研究过程可以看出，作者其实很早就发现android设备上goagent的证书无法很好地被使用（即使导入了还有问题），而且在android上goagent对https的转发性能也很不理想，所以他在<a href="https://code.google.com/p/gaeproxy/downloads/detail?name=gaeproxy-0.10.2.apk&amp;can=1&amp;q=">0.10.2版本</a>就引入了第三方服务，当时是用FreeSocksProxy.org；后来又改为了这种自建在VPS上的代理。其实我很惊讶53端口的代理能带来这么强劲的速度和承载能力——coolapk上约467750次下载，google play上100,000 - 500,000次下载，不知道作者到底用了多少服务器来做这个“https代理”。<br>
+　　我很佩服作者的这种公益精神和技术能力，但是从未在任何软件介绍和项目页面说明这一点，就显得非常不恰当。从学生时代，不少Geek朋友就有这种理念——我们写我们的，用户都是傻x，只管用就好了。实际上我赞同用户有权也应当是傻瓜，他们应该不用向我这样研究一个软件的代码才能使用它，面对普通用户的软件应该是轻松易用的；但是这种轻松附随了一个要求——用户有选择权。用户虽然可以傻瓜地使用软件，但有权在涉及自己切身利益——特别是隐私问题的时候有知情权和选择权。<br>
+　　独立的软件作者写东西往往没有金钱回报，研究问题也纯属兴趣和公益心，但是只要你自认是Geek，那么你就一样有社会责任，这种责任不仅要求你做对社会有益的事情，而且要求你将这种“你自认为对社会有益的事情”公开出来，由社会监督；这种责任不仅要求你提供给用户好的东西，还要求你允许用户自行评判“你自认为好的东西”。<strong>这也是自由的要义——精神和意志上的自由才是真正的自由，受蒙蔽而使用免费的“自由软件”，蒙蔽用户而发布“自由软件”，均非真正的自由。</strong><br>
+　　也许有人不同意，免费为你提供服务，你放下筷子还骂娘？殊不知信息权力已经成为一种真正可以影响社会的权力，比如google，它免费为世界提供Gmail服务，虽然我们没有支付任何费用，但它有义务保障用户的数据和隐私安全，而且有义务接受全世界各种眼光（包括黑客）的监督；比如国内的很多商业和半商业网站，明文存储的密码给无数人带来了损失，正是因为信息权力不受监督所致——一方面是政府要求明文存储密码的权力，一方面是网站安全流程设计上的权力，均不受公众监督。<strong>任何不受监督的权力必然导致腐败，即使这种腐败是一种极为特别的形式——掌握权力者本身甚至可能并未参与，但绝不意味着他可以置身世外</strong>。在开源领域，作者的代码虽然已经公开，但仍有责任向公众介绍软件的机制，特别是涉及隐私、涉及代码外黑箱的部分。<br>
+　　在gaeproxy这个软件的问题上，作者从未积极地向公众介绍其“https代理”功能的原理，而且一直严重这一误导性的名称，并且在开源的代码外架设有验证服务器、代理服务器，这是多个黑箱，其中有一个留有陷阱就会让数万用户产生不可估量的损失。即使作者本身不参与窃取隐私的行动，这种不透明的流程仍然可能被人破解及利用。实际上了解到这个软件使用的第三方代理地址易如反掌，而一旦攻破这些VPS，获取代理的log后就能得到不少有价值的隐私信息，如果进一步将这些代理服务器用于中间人攻击，后果不堪设想。<br>
+　　<strong>即使我们无比相信开源软件的作者，我们也无法相信不受监督的权力。请将自由还给自由软件的用户。</strong></p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/2013/02/gaeproxy-analysis/" title="Previous post (older)">
+            <span>Previous</span>
+            （新版）对gaeproxy的“https代理”功能之分析和说明
+            </a>
+        
+        
+        
+        <a rel="next" href="/2013/04/kindle-reader-without-google-reader/" title="Next post (newer)">
+            <span>Next</span>
+            不再依赖Google Reader的Kindle Reader
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.c81551cd4dbef120af278f16966a41142c02be9ff5d6a669be09820fbf047456.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

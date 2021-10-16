@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog</title>
+
+    
+    
+    
+    <meta property="og:site_name" content="WilliamGates&#39; Blog" />
+    <meta property="og:title" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog"/>
+    <meta itemprop="name" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
+    <meta name="twitter:title" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
+    <meta name="application-name" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
+
+
+    <meta name="description" content="" />
+    <meta name="twitter:description" content=""/>
+    <meta itemprop="description" content=""/>
+    <meta property="og:description" content="" />
+
+    
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    <script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                    WilliamGates&#39; Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/about/">About</a>
+                
+                <a href="/links/">Links</a>
+                
+                <a href="/posts/">Posts</a>
+                
+                <button id="dark-mode-button">
+                  <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                  <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                </button>
+            </div>
+            </div>
+    </div>
+</nav>
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>（新版）对gaeproxy的“https代理”功能之分析和说明</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                              
+                            
+                            By William Gates | <time>February 23, 2013</time>
+                            | 3 minutes
+                        </div>
+                        <div class="tags">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <ul>
+<li>经过我旧版文章分析后，gaeproxy的作者Max Lv很诚恳和大度地在项目主页和官方twitter帐号上解释了“https代理”功能，并将本地址作为说明放在项目主页上，故我将较为耸人听闻的旧版移至另一地址，在本地址重做了一份简单的说明。</li>
+<li>对我的文章给作者带来的一些误解表示歉意。</li>
+<li>再次声明，我相信作者从未也永远不会谋求窃取/篡改用户数据，作者提供的该功能是基于善意，我个人只是指出整个流程中的一个安全风险，并希望所有用户都有所了解之后自己选择是否要使用。</li>
+</ul>
+<p>　　<a href="https://github.com/madeye/gaeproxy">gaeproxy</a>是goagent在android上的客户端，作者是<a href="http://madeye.me/">Max Lv</a>，<a href="https://code.google.com/p/goagent/">goagent</a>在google code页面上将其作为android上使用goagent的解决方案来介绍。</p>
+<p>　　说明1：gaeproxy的“https代理”功能<br>
+　　该功能实际上是将https的请求和回应通过作者提供的代理服务器来进行代理，原理如下：<br>
+　　没有打开“https代理”功能时，所有的流量都通过goagent服务器端，而goagent服务器端是部署在google appengine（GAE）上的，在客户和服务器之间，只有google的服务器存在，这个过程中只要你信任google的服务器，就是相对安全的。如图：</p>
+<p><img loading="lazy" 
+    src="/assets/img/gaeproxy-analysis-01.png" 
+    alt="gaeproxy-analysis-01" 
+     
+    width=625 
+    height="725"  /></p>
+<p>　　打开“https代理”功能时，https流量（往往是敏感数据，不过会被加密，并非明文）会通过作者提供的服务器代理，而不经过goagent的服务器端，这时候如果有人攻破了作者提供的服务器，在其上进行中间人欺骗，或者解密用户与目的服务器交换的数据（并非完全不可能），会给用户造成无法估量的损失。如图：</p>
+<p><img loading="lazy" 
+    src="/assets/img/gaeproxy-analysis-02.png" 
+    alt="gaeproxy-analysis-02" 
+     
+    width=617 
+    height="725"  /></p>
+<p>　　说明2：风险所在<br>
+　　如上文所述，典型的goagent架构全程只通过google所维护的服务器来代理，虽然由于gae不支持https connect，所以在google的服务器上https请求会被解码并重编码（我理解如此，未必正确），所以不管是PC还是android上访问https网站，都需要导入证书。<br>
+　　而gaeproxy作者提供的https代理不经过google的服务器，而是经过作者自己提供并维护的服务器，考虑到人力物力上的差距，作者维护的服务器在安全性上不如google的服务器来得可信，这就是我们所担心的。</p>
+<p>　　说明3：风险到底有多大<br>
+　　实际上这种风险与你购买收费VPN、SSH代理的风险是一样的，甚至小于使用免费VPN、SSH的风险（包括著名的地下铁），存在恶意的VPN和SSH提供商能够给你带来更大的损害。我只是提出了整个流程中的一种可能性，而且不满于作者（当时）未明示这一事实而已。实际上我猜测是由于android设备上直接使用典型goagent模式时，https的性能比较差（我实测如此），所以作者才添加了“https代理”这一功能，并非出于恶意，相反自己花费了经费。<br>
+　　实际上goagent的作者也承认，PC上典型的goagent架构也是不安全的，我们只是信任google的维护能力而已，并不是说goagent就是安全的。<br>
+　　实际上翻墙的方法无非两种，一种是通过各类代理，其中加入了一道甚至几道服务器后，信息被窃取/篡改的可能性显然会增加；另一种是通过对网络协议的修改，如西厢计划等小众方案，由于需要使用别人编写的软件，一样存在风险。没有一种翻墙方式是不增加信息被窃取/篡改的风险的，只能说一定程度上降低了被GFW窃取/篡改的风险而已。</p>
+<p>　　<strong>总结：既然gaeproxy的作者明示了“https代理”功能的原理，我对这个软件及其服务并无进一步的意见，我推荐大家继续使用这个软件。就我个人而言，我不会继续使用“https代理”这个功能，但如果你选择继续使用，风险并没有多么可怕。</strong></p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/" title="Previous post (older)">
+            <span>Previous</span>
+            自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题
+            </a>
+        
+        
+        
+        <a rel="next" href="/2013/02/gaeproxy-analysis-deprecated/" title="Next post (newer)">
+            <span>Next</span>
+            （旧版）对gaeproxy的一些研究，兼谈Geek的社会责任
+            </a> 
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+            <a href="/index.xml">RSS</a>
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.c81551cd4dbef120af278f16966a41142c02be9ff5d6a669be09820fbf047456.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>
