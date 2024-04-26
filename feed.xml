@@ -1,24 +1,241 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>WilliamGates&#39; Blog</title>
     <link>https://blog.williamgates.net/</link>
-    <description>Recent content on WilliamGates&#39; Blog</description>
+    <description>WilliamGates&#39; Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 15 Oct 2021 05:50:00 +0000</lastBuildDate><atom:link href="https://blog.williamgates.net/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-    <title>请你勇敢地伸出手</title>
-    <link>https://blog.williamgates.net/2014/05/fight_for_happiness/</link>
-    <pubDate>Mon, 19 May 2014 21:55:50 +0000</pubDate>
+    <lastBuildDate>Fri, 26 Apr 2024 21:56:00 +0800</lastBuildDate>
     
-    <guid>https://blog.williamgates.net/2014/05/fight_for_happiness/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/fight_for_happiness.png&#34; 
-    alt=&#34;fight_for_happiness&#34; 
-     
-    width=500 
-    height=&#34;649&#34;  /&gt;&lt;/p&gt;
+    <atom:link href="https://blog.williamgates.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用whisper生成字幕的经验备忘</title>
+      <link>https://blog.williamgates.net/2024/04/use-whisper-to-generate-subtitles/</link>
+      <pubDate>Fri, 26 Apr 2024 21:56:00 +0800</pubDate>
+      
+      <guid>https://blog.williamgates.net/2024/04/use-whisper-to-generate-subtitles/</guid>
+      <description>&lt;p&gt;　　&lt;a href=&#34;https://huggingface.co/openai/whisper-large-v3&#34;&gt;whisper&lt;/a&gt;是openai发布的模型，主要用于语音转写。我最近尝试了用它来听写并生成字幕，主要的需求显然是文字准确，不漏记也不多记（多记显然更不能接受，下文会提到幻觉问题）；次要的需求是：每行字幕不应该太长，字幕时间戳应该尽量准确。本文是截至2024年4月的一些知识和经验备忘，是一篇“综述”，不是一篇详尽的教程。本文中对参数的解释大多基于作者给出的解释或本人对相关工具代码的阅读和理解，但对参数调整的意见就纯粹基于个人的感觉了，不一定有科学依据。&lt;/p&gt;
+&lt;h2 id=&#34;相关术语&#34;&gt;
+    &lt;a href=&#34;#%e7%9b%b8%e5%85%b3%e6%9c%af%e8%af%ad&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    相关术语
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ASR&lt;/code&gt;, Automatic Speech Recognition, also known as Speech To Text (STT), refers to the problem of automatically transcribing spoken language, 这解释来自&lt;a href=&#34;https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/asr/intro.html&#34;&gt;Nvidia&lt;/a&gt;。我们在使用whisper的过程中，主要使用的就是ASR功能。在具体的工具中，该部分任务或功能一般被称为&lt;code&gt;transcribe&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;VAD&lt;/code&gt;, Voice Activity Detection, 检测语音（或者说反过来，检测非语音），标出语音部分供模型进行下一步推理。个人认为第三方工具针对whisper的增强主要体现在推理速度和VAD两方面，我们几乎所有的参数调整也集中针对于VAD。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Hallucination&lt;/code&gt;, the experience of seeing, hearing, feeling, or smelling something that does not exist, 用过chatGPT的你应该很熟悉了，幻觉就是模型在一本正经地胡说八道。在ASR用途的模型中，幻觉主要体现为转写了根本不存在的语句，而不是字词意义上的识别错误。正因为这样，幻觉在生成字幕的任务中危害非常大，因为字词错误观众可以推测、可以忽略，完全不存在的台词则严重影响对内容的理解。whisper最常出现的典型幻觉是，它会在字幕的结尾加上“谢谢观看”或者类似意思的语句。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Beam search&lt;/code&gt;, a heuristic search algorithm that explores a graph by expanding the most promising node in a limited set, 这解释来自&lt;a href=&#34;https://en.wikipedia.org/wiki/Beam_search&#34;&gt;维基百科&lt;/a&gt;。在whisper的使用中，有两种设置路径：一种是使用whisper的&lt;code&gt;beam_size&lt;/code&gt;和&lt;code&gt;patience&lt;/code&gt;等参数来进行beam search，另一种是使用&lt;code&gt;temperature&lt;/code&gt; &lt;code&gt;best_of&lt;/code&gt; &lt;code&gt;compression_ratio_threshold&lt;/code&gt;和&lt;code&gt;log_prob_threshold&lt;/code&gt;等参数来进行取样。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;diarization&lt;/code&gt;, Speaker diarization is the process of segmenting audio recordings by speaker labels and aims to answer the question “who spoke when?”, 还是来自&lt;a href=&#34;https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/asr/speaker_diarization/intro.html&#34;&gt;Nvidia&lt;/a&gt;的解释。whisper模型没有这个功能，各种工具都承认他们自己的实现不能算完美。理论上这能实现更准确的字幕断句，但本身并不是生成字幕的强需求，我没有深入研究。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;WER&lt;/code&gt;, word error rates, ASR模型的能力相对比较容易考核，这就是最常用的指标，另一个常用的指标是&lt;code&gt;CER&lt;/code&gt;即character error rates）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;模型&#34;&gt;
+    &lt;a href=&#34;#%e6%a8%a1%e5%9e%8b&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    模型
+&lt;/h2&gt;
+&lt;p&gt;　　openai官方提供了各种大小的模型，就我们非实时生成字幕的用途来说，只有large模型有意义（最新的是large-v3）。&lt;/p&gt;
+&lt;p&gt;　　huggingface上有很多在whisper基础上调优的模型，我尝试下来日语的&lt;a href=&#34;https://huggingface.co/clu-ling/whisper-large-v2-japanese-5k-steps&#34;&gt;clu-ling/whisper-large-v2-japanese-5k-steps&lt;/a&gt;还不错，但记得基于CTranslate2的推理工具需要转换后的CT2模型，&lt;a href=&#34;https://huggingface.co/zh-plus/faster-whisper-large-v2-japanese-5k-steps&#34;&gt;有人帮你做好了&lt;/a&gt;。这个模型的缺陷是在某些情况下转写内容可能缺少标点符号，本文的速度测试中的样本在某些推理工具中就会这样，暂时不知道原因。另一个日语模型&lt;a href=&#34;https://huggingface.co/vumichien/whisper-large-v2-mix-jp&#34;&gt;vumichien/whisper-large-v2-mix-jp&lt;/a&gt;就会有标点。&lt;/p&gt;
+&lt;p&gt;　　作为字幕，我们希望转写文本既准确又简短，要注意不同的模型在推理工具相同的参数下转写的长度不同，这里不是指遣词造句的风格不同导致句子长度不同，而是换行（换一条新字幕）的频率不同。虽然这一点和下文提到的VAD关系最大，但根据我的经验，模型也会有影响。&lt;/p&gt;
+&lt;h2 id=&#34;推理工具&#34;&gt;
+    &lt;a href=&#34;#%e6%8e%a8%e7%90%86%e5%b7%a5%e5%85%b7&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    推理工具
+&lt;/h2&gt;
+&lt;p&gt;　　以下工具全都可以顺利在WSL2中运行，记得如果你需要在WSL2中安装cuda-tools或cudnn之类的玩意，请遵守&lt;a href=&#34;https://docs.nvidia.com/cuda/wsl-user-guide/index.html&#34;&gt;Nvidia的指导&lt;/a&gt;，简单来说就是不要安装linux驱动（WSL2里面的显卡驱动是windows驱动提供的），安装那些不含驱动的包就好，建议用conda来做这些工作。&lt;/p&gt;
+&lt;h3 id=&#34;官方工具-openaiwhisper&#34;&gt;
+    &lt;a href=&#34;#%e5%ae%98%e6%96%b9%e5%b7%a5%e5%85%b7-openaiwhisper&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    官方工具 openai/whisper
+&lt;/h3&gt;
+&lt;p&gt;　　&lt;a href=&#34;https://github.com/openai/whisper&#34;&gt;openai/whisper&lt;/a&gt;是openai官方提供的工具，按照官方的介绍以及&lt;code&gt;no_speech_threshold&lt;/code&gt;这个参数，这个工具会使用whisper自己的VAD功能，个人觉得跟下文中的第三方工具使用的VAD方法而言，只能说聊胜于无（第三方工具几乎全都引入了自己的VAD，说明他们也是这么想的）。这个工具不能调用非官方的whisper模型，推理速度也没有任何优势。&lt;/p&gt;
+&lt;h3 id=&#34;主流后端-systranfaster-whisper-及其命令行套壳-softcatalawhisper-ctranslate2&#34;&gt;
+    &lt;a href=&#34;#%e4%b8%bb%e6%b5%81%e5%90%8e%e7%ab%af-systranfaster-whisper-%e5%8f%8a%e5%85%b6%e5%91%bd%e4%bb%a4%e8%a1%8c%e5%a5%97%e5%a3%b3-softcatalawhisper-ctranslate2&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    主流后端 SYSTRAN/faster-whisper 及其命令行套壳 Softcatala/whisper-ctranslate2
+&lt;/h3&gt;
+&lt;p&gt;　　&lt;a href=&#34;https://github.com/SYSTRAN/faster-whisper&#34;&gt;SYSTRAN/faster-whisper&lt;/a&gt;是很主流的whisper推理工具，它不仅不提供图形界面，而且也不提供命令行接口，只能作为一个Python库被调用，幸好有人做了一个命令行套壳&lt;a href=&#34;https://github.com/Softcatala/whisper-ctranslate2&#34;&gt;Softcatala/whisper-ctranslate2&lt;/a&gt;，节省很多工作量。faster-whisper的重要优势在于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用了第三方VAD方案&lt;a href=&#34;https://github.com/snakers4/silero-vad&#34;&gt;silero-vad&lt;/a&gt;,效果明显、可调参数多（部分不是silero-vad的参数，而是faster-whisper给VAD功能添加的参数，下文会提到，很有用处）。通过VAD将音频提前切断，只将语音部分提供给whisper做转写，大幅度降低了whisper的幻觉，（在某些情况下大幅度）提高了转写的速度。&lt;/li&gt;
+&lt;li&gt;可以加载非官方whisper模型，有些基于whisper调优的模型对特定语言的转写能力提升很大。&lt;/li&gt;
+&lt;li&gt;使用&lt;a href=&#34;https://github.com/OpenNMT/CTranslate2/&#34;&gt;CTranslate2&lt;/a&gt;进行推理,推理速度明显快（数倍）于官方工具。但是需要使用兼容CTranslate2的模型，hugging face上标为ct2的模型就是这类，其他模型也可以通过脚本转换为ct2模型。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;　　我个人主要使用的就是Softcatala/whisper-ctranslate2，需要注意的参数主要包括（未特别说明独有的参数，在官方工具中也有）：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;length_penalty&lt;/code&gt;, 这是whisper模型提供的参数，并不硬性对单行字幕长度产生影响，只会在推理时更倾向于选择产生较短的句子，影响转写质量，不建议修改。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;no_speech_threshold&lt;/code&gt;, whisper自己的VAD设置，值越低，越偏向于认定一段声音为沉默（即不是语音）。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;word_timestamps&lt;/code&gt;, 是否提供基于词的时间戳，这个选项实际上不会导致输出的字幕文件是每行一个词的，只是在推理过程中对词标出了时间戳，生成字幕文件的时候还是会合并成每行一句话，这有利于控制单行字幕长度，也可以用于在字幕中标出当前发音的词。但是whisper提供的时间戳实际上是不准的，下文会提到。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;repetition_penalty&lt;/code&gt;, 软性要求whisper在推理时降低重复，个人感觉不是很好用，设置为1.2以上的时候有效果，但会影响转写内容（即使不存在重复，语句内容也会随着这个参数而发生变化）。这是ctranslate2的功能，不是whisper模型实现的，当然在官方工具中也就没有这个参数。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;no_repeat_ngram_size&lt;/code&gt;, 在一行结果中没有重复的如此规模的“语丝”，按理说在设为2的时候应该不会出现任何重复的字/词，但实际上效果并不理想，个人觉得不是很好用，且会影响转写内容，建议自己尝试效果。这是ctranslate2的功能，不是whisper模型实现的，官方工具不包含这个参数。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max_words_per_line&lt;/code&gt;, 基于上述对每个词打时间戳的功能，可以限制每行字幕的长度，这不是whisper提供的功能，是推理工具在写入字幕文件时进行的处理。但是whisper-ctranslate2和官方工具一样，实现的方法非常粗暴，就是严格按照词数截断字幕，不能按照标点或空格合理截断。&lt;a href=&#34;https://github.com/Softcatala/whisper-ctranslate2/pull/78&#34;&gt;有个PR&lt;/a&gt;试图在一定程度上解决这个问题，但还没有被合并。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vad_threshold&lt;/code&gt;, 这是faster-whisper自带的silero-vad的参数，官方工具没有。这个值越高，越偏向于认定一段声音为沉默（与&lt;code&gt;no_speech_threshold&lt;/code&gt;的方向相反）。对于字正腔圆的样本（例如新闻或动漫），建议设为默认的0.5；对于偏向生活化、口语化的样本，建议设为0.4乃至0.35（更低也可以尝试）。由于这个VAD工作于whisper推理之前，所以这个值越高，判断出的沉默越多、语音越少，whisper的工作内容越少、推理速度越快。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vad_min_speech_duration_ms&lt;/code&gt;, 硬性抛弃短于多少时间的片段，即使VAD认为它是语音。这不是whisper实现的功能，是推理工具检查VAD结果时进行的处理。如果样本中有大量短促无意义的语音或类似于语音的声音，不想让它们毫无意义地出现在字幕中，这个功能非常有用。faster-whisper和whisper-ctranslate2暴露了这个参数，其他工具大多没有这个参数（没有进行这样的处理，或者硬编码了一个作者喜欢的值）。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vad_max_speech_duration_s&lt;/code&gt;, 规定交给whipser的一段语音的最大长度，有助于减少字幕中出现过长的句子。考虑到上述&lt;code&gt;max_words_per_line&lt;/code&gt;参数非常粗暴从而用途有限，这个参数挺有用的。我尝试使用faster-whisper的&lt;code&gt;chunk_length&lt;/code&gt;参数（硬性决定交给whisper的分段长度），但结果是导致了转写结果完全不正确；我尝试将faster-whisper的&lt;code&gt;vad_speech_pad_ms&lt;/code&gt;参数设置成0，也没有取得类似于whisperX的效果（完全没有效果）。因此基于vad的这个参数是非常有必要的。这也是官方工具没有的参数。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vad_min_silence_duration_ms&lt;/code&gt;, 硬性规定短于多少时间的沉默不会被切除，即使VAD认为它是沉默。这同样不是whisper的功能，是推理工具进行的处理，对于长句过多的结果，将这个值设为0有奇效（只要喘气就算一段新的语音，降低输入whisper模型的segment长度）。官方工具显然不会有这个参数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;超快工具-m-bainwhisperx&#34;&gt;
+    &lt;a href=&#34;#%e8%b6%85%e5%bf%ab%e5%b7%a5%e5%85%b7-m-bainwhisperx&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    超快工具 m-bain/whisperX
+&lt;/h3&gt;
+&lt;p&gt;　　&lt;a href=&#34;https://github.com/m-bain/whisperX&#34;&gt;m-bain/whisperX&lt;/a&gt;这个工具标榜自己的快，虽然其使用faster-whisper作为后端，但它并不是纯粹的faster-whisper套壳。它用有点奇怪的方法实现了单个音频样本的分片批量处理（让faster-whisper社区&lt;a href=&#34;https://github.com/SYSTRAN/faster-whisper/issues/59&#34;&gt;感到困惑&lt;/a&gt;）；由于批量处理，不能在转写过程中显示结果，只能以百分比方式显示进度；由于批量处理，它不适合打开&lt;code&gt;condition_on_prev_text&lt;/code&gt;参数，因此可能降低转写内容的稳定性。它虽然使用了faster-whisper，但不使用faster-whisper的VAD功能，而是使用了作者提供的VAD模型（实际上可能是&lt;a href=&#34;https://huggingface.co/pyannote/segmentation&#34;&gt;pyannote/segmentation&lt;/a&gt;），这个模型比faster-whisper的VAD模型大差不多10倍，可能效果也更好（实测是的）。它在whisper之外，引入facebook的&lt;a href=&#34;https://huggingface.co/facebook/wav2vec2-large-960h-lv60-self&#34;&gt;wav2vec&lt;/a&gt;用来辅助生成精确的时间戳，但这功能只能在部分主流语言上实现（因为需要对应语言的wav2vec模型，第三方调优的也可以），而且对数字的处理不佳。因为它它暴露的VAD参数很少，特别是推理工具实现而非模型实现的那些参数（例如faster-whisper的&lt;code&gt;vad_min_speech_duration_ms&lt;/code&gt;）；即使是暴露的那些参数，也并不是在VAD流程的每个阶段都使用用户指定的值，有些阶段是硬编码的。总而言之，这个项目的速度确实是优势（虽然在我们的测试中不明显，更长的、VAD不容易处理好的样本会明显得多，特别是保持&lt;code&gt;chunk_size&lt;/code&gt;为默认值而不在乎出现长句的情况下，速度数倍于faster-whisper是很正常的），但其代码质量不太好评价。&lt;/p&gt;
+&lt;p&gt;　　我使用该工具较少，可以介绍的参数主要包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;vad_onset&lt;/code&gt;, 基本等于faster-whisper的&lt;code&gt;vad_threshold&lt;/code&gt;，但两者VAD模型不同，数值需要自己摸索。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vad_offset&lt;/code&gt;, 猜测等于faster-whisper中的&lt;code&gt;neg_threshold&lt;/code&gt;（代码中的变量，没有暴露为命令行参数），faster-whisper硬编码为&lt;code&gt;vad_threshold&lt;/code&gt;减去0.15，whisperX的默认值是&lt;code&gt;vad_onset&lt;/code&gt;减去0.137。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chunk_size&lt;/code&gt;, 这个参数不是提供给faster-whisper的&lt;code&gt;chunk_length&lt;/code&gt;, 而是提供给VAD的，类似于whisper-ctranslate2的&lt;code&gt;vad_max_speech_duration_s&lt;/code&gt;, 但降低长句的效果比whisper-ctranslate2好得多，可能得益于更好的VAD模型或更好的处理方式（winsperX的作者的&lt;a href=&#34;https://arxiv.org/abs/2303.00747&#34;&gt;论文&lt;/a&gt;中有关于这个&lt;code&gt;VAD Cut &amp;amp; Merge&lt;/code&gt;的描述)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;精确时间轴-linto-aiwhisper-timestamped&#34;&gt;
+    &lt;a href=&#34;#%e7%b2%be%e7%a1%ae%e6%97%b6%e9%97%b4%e8%bd%b4-linto-aiwhisper-timestamped&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    精确时间轴 linto-ai/whisper-timestamped
+&lt;/h3&gt;
+&lt;p&gt;　　&lt;a href=&#34;https://github.com/linto-ai/whisper-timestamped&#34;&gt;linto-ai/whisper-timestamped&lt;/a&gt;介绍了whisper为什么不能提供准确的时间戳，也介绍了其他提供准确时间戳方案的局限性（主要是whisperX使用wav2vec的方案），强调自己能够在不借助辅助模型的情况下实现精准时间戳，我觉得这个项目的README价值比工具更大。它提供三种不同的VAD方案供选择，但没有暴露任何VAD参数。它可以使用第三方模型，但不要被他的说明骗了，使用第三方模型不需要加&lt;code&gt;--backend transformers&lt;/code&gt;参数（加了跑不起来）。我没有测试过其时间戳是否真的比别的工具精准，你可以自己试试看。它不是一个基于faster-whisper的工具，意味着它的速度不会是优势。&lt;/p&gt;
+&lt;h3 id=&#34;ggerganovwhispercpp&#34;&gt;
+    &lt;a href=&#34;#ggerganovwhispercpp&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    ggerganov/whisper.cpp
+&lt;/h3&gt;
+&lt;p&gt;　　&lt;a href=&#34;https://github.com/ggerganov/whisper.cpp&#34;&gt;whisper.cpp&lt;/a&gt;是另一个主流工具（31.1K star），设计之初致力于在CPU上高效推理，没看出其在GPU上有特殊优势，而且没有附加的VAD功能，因此我没有实际用过，你可以试试看。&lt;/p&gt;
+&lt;h3 id=&#34;速度测试&#34;&gt;
+    &lt;a href=&#34;#%e9%80%9f%e5%ba%a6%e6%b5%8b%e8%af%95&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    速度测试
+&lt;/h3&gt;
+&lt;p&gt;　　使用的样本是&lt;code&gt;[SFEO-Raws] Koimonogatari - 01 (BD 720P x264 10bit AACx2)[9369B674].mp4&lt;/code&gt;即恋物语第一集的音频，长度为26m34s，转换为16000hz的wav（这对于VAD很重要，因为VAD模型大多是基于8K和16Khz训练的）。所有的运行时间都是time命令的real项。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;以下各行的命令分别为：
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;whisperx --model whisper-large-v2-japanese --device cuda --output_format srt --language ja --vad_onset 0.5 --vad_offset 0.35 --no_speech_threshold 0.3 --print_progress True output.wav
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;whisperx --model whisper-large-v2-japanese --device cuda --output_format srt --language ja --vad_onset 0.5 --vad_offset 0.35 --chunk_size &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; --no_speech_threshold 0.3 --print_progress True output.wav
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;whisper-ctranslate2 --device cuda --compute_type float16 --model_directory ./whisper-large-v2-japanese --language ja --local_files_only &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt; --output_format srt --word_timestamps &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt; --hallucination_silence_threshold &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt; --beam_size &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt; --vad_filter &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt; --vad_threshold 0.5 --vad_min_silence_duration_ms &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; --vad_min_speech_duration_ms &lt;span class=&#34;m&#34;&gt;100&lt;/span&gt; --vad_max_speech_duration_s &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; --no_speech_threshold 0.3 output.wav
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;whisper-ctranslate2 --device cuda --compute_type float16 --model_directory ./whisper-large-v2-japanese --language ja --local_files_only &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt; --output_format srt --word_timestamps &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt; --hallucination_silence_threshold &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt; --beam_size &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt; --vad_filter &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt; --vad_threshold 0.5 --vad_min_silence_duration_ms &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; --vad_max_speech_duration_s &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; --no_speech_threshold 0.3 output.wav
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;whisper_timestamped --model clu-ling/whisper-large-v2-japanese-5k-steps --device cuda --output_dir . --output_format srt --language ja --vad True --no_speech_threshold 0.3 --verbose True --accurate
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;whisper_timestamped --model clu-ling/whisper-large-v2-japanese-5k-steps --device cuda --output_dir . --output_format srt --language ja --vad silero:3.1 --no_speech_threshold 0.3 --verbose True --accurate output.wav
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;序号&lt;/th&gt;
+&lt;th&gt;工具&lt;/th&gt;
+&lt;th&gt;时间&lt;/th&gt;
+&lt;th&gt;字幕条数&lt;/th&gt;
+&lt;th&gt;备注&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;whisperX&lt;/td&gt;
+&lt;td&gt;1m21.291s&lt;/td&gt;
+&lt;td&gt;57&lt;/td&gt;
+&lt;td&gt;全是长句，但速度确实快&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;whisperX&lt;/td&gt;
+&lt;td&gt;1m32.823s&lt;/td&gt;
+&lt;td&gt;176&lt;/td&gt;
+&lt;td&gt;句子普遍较短，可能得益于更好的VAD模型，但有些句子反而非常长&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;whisper-ctranslate2&lt;/td&gt;
+&lt;td&gt;3m6.634s&lt;/td&gt;
+&lt;td&gt;241&lt;/td&gt;
+&lt;td&gt;句子长短与上一栏相比各有千秋，效果均不完美&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;whisper-ctranslate2&lt;/td&gt;
+&lt;td&gt;3m7.070s&lt;/td&gt;
+&lt;td&gt;184&lt;/td&gt;
+&lt;td&gt;可能是物语系列讲话太疯狂的原因，去掉&lt;code&gt;vad_min_speech_duration_ms&lt;/code&gt;会加强转写准确性，但长句更多了……&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;whisper_timestamped&lt;/td&gt;
+&lt;td&gt;14m59.857s&lt;/td&gt;
+&lt;td&gt;207&lt;/td&gt;
+&lt;td&gt;看到这感人的时间了吧，另外结果中的长句和准确性都不太理想，可能是我没有充分调试&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;whisper_timestamped&lt;/td&gt;
+&lt;td&gt;12m35.261s&lt;/td&gt;
+&lt;td&gt;208&lt;/td&gt;
+&lt;td&gt;换了vad速度快一点，句子长度也好一点&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;字幕翻译及其他后处理&#34;&gt;
+    &lt;a href=&#34;#%e5%ad%97%e5%b9%95%e7%bf%bb%e8%af%91%e5%8f%8a%e5%85%b6%e4%bb%96%e5%90%8e%e5%a4%84%e7%90%86&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    字幕翻译及其他后处理
+&lt;/h2&gt;
+&lt;p&gt;　　对于减少字幕中长句的需求，目前看来最好的方法不是在上面提到的工具中折腾chunk的长度，而是直接用非常短的字词长度硬性截断字幕（使用&lt;code&gt;max_words_per_line&lt;/code&gt;之类的参数），再通过对字幕文件进行后处理，将字幕按照标点、空格等分隔符拼接起来。根据whisper的工作原理，这个行为不能反过来——后处理的时候不知道每个字词的时间戳，因此不能生成长句再拆分。但这条路还没有走通，虽然有人做了&lt;a href=&#34;https://github.com/zj1123581321/Adjust_SubTitle&#34;&gt;类似思路的小工具&lt;/a&gt;，但他的设计目的是合并过短的字幕，通过初步阅读代码，我觉得简单修改这个工具也达不成我们的目的。&lt;/p&gt;
+&lt;p&gt;　　对于字幕的翻译，一股脑发给AI的效果会很差，AI还会评价剧情甚至因为（它认为的）色情暴力之类而拒绝翻译。因此一股脑丢给google翻译/deepl之类的翻译引擎可能是比较简单的选择，而一句句发给AI可能是效果较好的方案。我还没有找到最合适的工具。&lt;/p&gt;
+&lt;p&gt;　　可能会尝试自己写一个工具来做以上这两件事，就不在本文中介绍了。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>请你勇敢地伸出手</title>
+      <link>https://blog.williamgates.net/2014/05/fight_for_happiness/</link>
+      <pubDate>Mon, 19 May 2014 21:55:50 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2014/05/fight_for_happiness/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/fight_for_happiness.png&#34; alt=&#34;fight_for_happiness&#34;  width=500 height=&#34;649&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　是的，我就是你们所嘲笑的脑残，自掏腰包去看一个60后写的80后的青春故事，然后哭得睁不开眼。&lt;br&gt;
 　　是的，我就是你们所不齿的傻瓜，看一个破绽百出的、虚构的故事，然后试图从中矫情地“缅怀”自己的青春。&lt;br&gt;
 　　是的，这片子剧情上的硬伤实在让人出戏，且不谈文科生为什么读计算机系，也不说为什么女神最终总要嫁一个势利的土豪，最大的硬伤显然来自——如同豆瓣上某位提到的——作为60后的高胖子，认为出国是非常牛逼、非常困难的一件事，出了国混好了必然不回来，混惨了必然不好意思回来，断然不存在回国发展的可能性。&lt;br&gt;
@@ -47,18 +264,16 @@
 &lt;/blockquote&gt;
 &lt;p&gt;　　也许高晓松心目中真正的青春故事是这样的歌词，是比“我也是偶然翻相片 才想起同桌的你”更加伤感、更加沉静、更多嗟叹而更少缅怀的，因为他明白青春就是这样不清不楚、就是这样莫名其妙、就是这样无可救药地奔向懊悔和错过。&lt;br&gt;
 　　而我想说，即使青春不可能无悔，也不要忘记勇敢地伸出你的手。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>不再依赖Google Reader的Kindle Reader</title>
-    <link>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</link>
-    <pubDate>Tue, 16 Apr 2013 11:05:15 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</guid>
-    <description>
-        &lt;p&gt;　　&lt;a href=&#34;https://github.com/jiedan/kindlereader/&#34;&gt;Kindle Reader&lt;/a&gt;是一个自动将Google Reader内容生成mobi文件并通过邮件发送至kindle的工具，由&lt;a href=&#34;https://github.com/jiedan&#34;&gt;jieban&lt;/a&gt;开发。由于Google Reader即将关闭，所以我对其进行了一些修改，让程序从配置文件读取RSS地址并直接访问内容，不通过Google Reader的API，从而不再依赖Google的服务。&lt;br&gt;
+      <title>不再依赖Google Reader的Kindle Reader</title>
+      <link>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</link>
+      <pubDate>Tue, 16 Apr 2013 11:05:15 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</guid>
+      <description>&lt;p&gt;　　&lt;a href=&#34;https://github.com/jiedan/kindlereader/&#34;&gt;Kindle Reader&lt;/a&gt;是一个自动将Google Reader内容生成mobi文件并通过邮件发送至kindle的工具，由&lt;a href=&#34;https://github.com/jiedan&#34;&gt;jieban&lt;/a&gt;开发。由于Google Reader即将关闭，所以我对其进行了一些修改，让程序从配置文件读取RSS地址并直接访问内容，不通过Google Reader的API，从而不再依赖Google的服务。&lt;br&gt;
 　　感谢&lt;a href=&#34;https://github.com/jiedan&#34;&gt;jieban&lt;/a&gt;迅速接受了我的Pull Request，本文中的程序已经被合并到主分支。欢迎有兴趣的朋友到Github的&lt;a href=&#34;https://github.com/jiedan/kindlereader&#34;&gt;Kindle Reader项目&lt;/a&gt;去观看代码并给出意见（&lt;a href=&#34;https://github.com/williamgateszhao/kindlereader/&#34;&gt;本人fork出来的repository在此&lt;/a&gt;）。&lt;br&gt;
 　　多用户版正在开发，将免费提供公开服务，不再需要用户自行运行程序，类似于狗耳朵、kindle4rss等。&lt;/p&gt;
 &lt;h2 id=&#34;更新历史&#34;&gt;
@@ -117,37 +332,26 @@
     Windows用户使用方法（很简单）
 &lt;/h2&gt;
 &lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;下载最新版本的&lt;a href=&#34;https://github.com/williamgateszhao/kindlereader/archive/v0.6.5.zip&#34;&gt;v0.6.5&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;解压缩后，只需保留&lt;code&gt;kindlereader.exe&lt;/code&gt;和&lt;code&gt;config.sample.ini&lt;/code&gt;两个文件，放在任意目录，其他文件都不需要&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;如果你使用的系统是WindowsXP，那么你需要安装&lt;a href=&#34;http://www.microsoft.com/en-us/download/details.aspx?id=29&#34;&gt;Microsoft Visual C++ 2008 Redistributable Package&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;将&lt;code&gt;config.sample.ini&lt;/code&gt;改名为&lt;code&gt;config.ini&lt;/code&gt;，并修改其中的内容，具体可以看文件中的注释，主要要改的选项是：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; kindle_format，默认为book，如果你想要类似于狗耳朵那样的杂志形式，请改为periodical（只对官方系统有效）
- max_items_number，每个RSS源最多读取多少篇文章，建议不要太多
- max_image_per_article，每篇文章最多下载多少图片，由于上述的技术更新，本程序生成的文件不再动辄十几M，所以这里多一些也没问题
- max_old_date，不读取早于N天前的文章，一般与你多少天运行一次本程序相等，以免看到重复的文章
- mail_enable，如果需要程序自动将生成的mobi文件发送到kindle，需要将此项设为1
- to,一般是@free.kindle.com或@iduokan.com的邮箱，根据你使用系统的不同来决定
- username，你的邮箱（发信用，不是收信的iduokan或kindle邮箱）用户名，如果不使用gmail发信，请相应修改host、port、ssl等选项来符合你的smtp服务器（如QQ邮箱是host=smtp.qq.com,port=25,ssl=0）
- password，你的邮箱密码，如果不愿意将主要邮箱的密码明文写在配置文件中，可以单独注册一个邮箱专门用于发送
- feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，就写成feed1=www.guokr.com/rss/，每个feed结尾的数字不能重复，即必须是feed1、feed2、feed3这样编写下去，总量不限。如果你需要打开某个feed的强制全文输出（即原来该feed的文章只有摘要），你可以在http前面加上full，即fullhttp://www.a.com/rss/这样的。
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;下载亚马逊官方的mobi生成工具&lt;a href=&#34;http://s3.amazonaws.com/kindlegen/kindlegen_win32_v2_8.zip&#34;&gt;kindlegen&lt;/a&gt;，解压后只需要&lt;code&gt;kindlegen.exe&lt;/code&gt;一个文件，跟&lt;code&gt;kindlereader.exe&lt;/code&gt;和&lt;code&gt;config.ini&lt;/code&gt;放在同一个目录下&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;运行&lt;code&gt;kindlereader.exe&lt;/code&gt;之后，.mobi文件就会自动发送到你设置的邮箱，并被kindle所读取。如果你设置了不发送邮件，可以从当前目录下生成的data目录中找到两个.mobi文件，将较小的那个拷贝到kindle上也可以正常阅读。可以通过计划任务来让程序定期运行&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;如果你的&lt;code&gt;kindlereader.exe&lt;/code&gt;一闪而过，说明出错了，请到windows命令行下运行它来查看出错信息&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;下载最新版本的&lt;a href=&#34;https://github.com/williamgateszhao/kindlereader/archive/v0.6.5.zip&#34;&gt;v0.6.5&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;解压缩后，只需保留&lt;code&gt;kindlereader.exe&lt;/code&gt;和&lt;code&gt;config.sample.ini&lt;/code&gt;两个文件，放在任意目录，其他文件都不需要&lt;/li&gt;
+&lt;li&gt;如果你使用的系统是WindowsXP，那么你需要安装&lt;a href=&#34;http://www.microsoft.com/en-us/download/details.aspx?id=29&#34;&gt;Microsoft Visual C++ 2008 Redistributable Package&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;将&lt;code&gt;config.sample.ini&lt;/code&gt;改名为&lt;code&gt;config.ini&lt;/code&gt;，并修改其中的内容，具体可以看文件中的注释，主要要改的选项是：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;kindle_format，默认为book，如果你想要类似于狗耳朵那样的杂志形式，请改为periodical（只对官方系统有效）&lt;/li&gt;
+&lt;li&gt;max_items_number，每个RSS源最多读取多少篇文章，建议不要太多&lt;/li&gt;
+&lt;li&gt;max_image_per_article，每篇文章最多下载多少图片，由于上述的技术更新，本程序生成的文件不再动辄十几M，所以这里多一些也没问题&lt;/li&gt;
+&lt;li&gt;max_old_date，不读取早于N天前的文章，一般与你多少天运行一次本程序相等，以免看到重复的文章&lt;/li&gt;
+&lt;li&gt;mail_enable，如果需要程序自动将生成的mobi文件发送到kindle，需要将此项设为1&lt;/li&gt;
+&lt;li&gt;to,一般是@free.kindle.com或@iduokan.com的邮箱，根据你使用系统的不同来决定&lt;/li&gt;
+&lt;li&gt;username，你的邮箱（发信用，不是收信的iduokan或kindle邮箱）用户名，如果不使用gmail发信，请相应修改host、port、ssl等选项来符合你的smtp服务器（如QQ邮箱是host=smtp.qq.com,- port=25,ssl=0）&lt;/li&gt;
+&lt;li&gt;password，你的邮箱密码，如果不愿意将主要邮箱的密码明文写在配置文件中，可以单独注册一个邮箱专门用于发送&lt;/li&gt;
+&lt;li&gt;feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，就写成feed1=www.guokr.com/rss/，每个feed结尾的数字不能重复，即必须是feed1、feed2、feed3这样编写下去，总量不限。如果你需要打开某个feed的强制全文输出（即原来该feed的文章只有摘要），你可以在http前面加上full，即fullhttp://www.a.com/rss/这样的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;下载亚马逊官方的mobi生成工具&lt;a href=&#34;http://s3.amazonaws.com/kindlegen/kindlegen_win32_v2_8.zip&#34;&gt;kindlegen&lt;/a&gt;，解压后只需要&lt;code&gt;kindlegen.exe&lt;/code&gt;一个文件，跟&lt;code&gt;kindlereader.exe&lt;/code&gt;和&lt;code&gt;config.ini&lt;/code&gt;放在同一个目录下&lt;/li&gt;
+&lt;li&gt;运行&lt;code&gt;kindlereader.exe&lt;/code&gt;之后，.mobi文件就会自动发送到你设置的邮箱，并被kindle所读取。如果你设置了不发送邮件，可以从当前目录下生成的data目录中找到两个.mobi文件，将较小的那个拷贝到kindle上也可以正常阅读。可以通过计划任务来让程序定期运行&lt;/li&gt;
+&lt;li&gt;如果你的&lt;code&gt;kindlereader.exe&lt;/code&gt;一闪而过，说明出错了，请到windows命令行下运行它来查看出错信息&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2 id=&#34;linux用户使用方法桌面用户vps用户&#34;&gt;
     &lt;a href=&#34;#linux%e7%94%a8%e6%88%b7%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95%e6%a1%8c%e9%9d%a2%e7%94%a8%e6%88%b7vps%e7%94%a8%e6%88%b7&#34; class=&#34;anchor&#34;&gt;
@@ -179,45 +383,32 @@
     Linux用户使用方法（虚拟主机用户，以Hostmonster为例）
 &lt;/h2&gt;
 &lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;如果你的系统默认python版本就是2.7（运行python，查看显示的版本），那么使用方法完全和上面桌面/VPS用户一样&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;如果你系统默认的python不是2.7版本，请按照下面的说明安装2.7版本的python&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;修改&lt;code&gt;~/.bash_profile&lt;/code&gt;文件，确保文件中有以下内容（如已有某行，不用再写这一行）&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; PATH=$HOME/bin:$PATH
- LD_LIBRARY_PATH=$HOME/lib/
- export PATH
- export LD_LIBRARY_PATH
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;安装python&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; $ wget http://www.python.org/ftp/python/2.7.4/Python-2.7.4.tgz
- $ tar -xvfz Python-2.7.4.tgz
- $ cd  Python-2.7.4
- $ ./configure --prefix $HOME
- $ make install
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;确保&lt;code&gt;kindlereader.py&lt;/code&gt;和&lt;code&gt;config.ini&lt;/code&gt;、&lt;code&gt;kindlegen&lt;/code&gt;和&lt;code&gt;lib&lt;/code&gt;目录都存在的情况下，运行&lt;code&gt;~/bin/python kindlereader.py&lt;/code&gt;即可&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;可以使用脚本以便cron来运行，假设你的家目录是&lt;code&gt;/home1/xxx/&lt;/code&gt;,你将&lt;code&gt;kindlereader.py&lt;/code&gt;、&lt;code&gt;kindlegen&lt;/code&gt;和&lt;code&gt;config.ini&lt;/code&gt;存放在&lt;code&gt;/home1/xxx/kindle/&lt;/code&gt;下面，那么写一个&lt;code&gt;kindle.sh&lt;/code&gt;放在同一目录下&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; #!/bin/sh
- cd /home1/xxx/kindle/
- /home1/xxx/bin/python kindlereader.py
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;在虚拟主机控制面板里的“时钟守护作业”中填入&lt;code&gt;/home1/xxx/kindle/kindle.sh&lt;/code&gt;，我选的运行频率是&lt;code&gt;0 15 */3 * *&lt;/code&gt;，即每三天运行一次，在主机时间的每天15点。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;顺便可以再做一个cron任务，用于清理生成的data目录，填入&lt;code&gt;rm -rf /home1/xxx/kindle/data/&lt;/code&gt;即可，频率和上面一样，但时间要推迟一点，比如&lt;code&gt;0 16 */3 * *&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;如果你的系统默认python版本就是2.7（运行python，查看显示的版本），那么使用方法完全和上面桌面/VPS用户一样&lt;/li&gt;
+&lt;li&gt;如果你系统默认的python不是2.7版本，请按照下面的说明安装2.7版本的python&lt;/li&gt;
+&lt;li&gt;修改&lt;code&gt;~/.bash_profile&lt;/code&gt;文件，确保文件中有以下内容（如已有某行，不用再写这一行）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;PATH&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$HOME&lt;/span&gt;/bin:&lt;span class=&#34;nv&#34;&gt;$PATH&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nv&#34;&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$HOME&lt;/span&gt;/lib/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; PATH
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; LD_LIBRARY_PATH
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;安装python&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ wget http://www.python.org/ftp/python/2.7.4/Python-2.7.4.tgz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ tar -xvfz Python-2.7.4.tgz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ &lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt;  Python-2.7.4
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ ./configure --prefix &lt;span class=&#34;nv&#34;&gt;$HOME&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ make install
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;确保&lt;code&gt;kindlereader.py&lt;/code&gt;和&lt;code&gt;config.ini&lt;/code&gt;、&lt;code&gt;kindlegen&lt;/code&gt;和&lt;code&gt;lib&lt;/code&gt;目录都存在的情况下，运行&lt;code&gt;~/bin/python kindlereader.py&lt;/code&gt;即可&lt;/li&gt;
+&lt;li&gt;可以使用脚本以便cron来运行，假设你的家目录是&lt;code&gt;/home1/xxx/&lt;/code&gt;,你将&lt;code&gt;kindlereader.py&lt;/code&gt;、&lt;code&gt;kindlegen&lt;/code&gt;和&lt;code&gt;config.ini&lt;/code&gt;存放在&lt;code&gt;/home1/xxx/kindle/&lt;/code&gt;下面，那么写一个&lt;code&gt;kindle.sh&lt;/code&gt;放在同一目录下&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#!/bin/sh
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; /home1/xxx/kindle/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/home1/xxx/bin/python kindlereader.py
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;在虚拟主机控制面板里的“时钟守护作业”中填入&lt;code&gt;/home1/xxx/kindle/kindle.sh&lt;/code&gt;，我选的运行频率是&lt;code&gt;0 15 */3 * *&lt;/code&gt;，即每三天运行一次，在主机时间的每天15点。&lt;/li&gt;
+&lt;li&gt;顺便可以再做一个cron任务，用于清理生成的data目录，填入&lt;code&gt;rm -rf /home1/xxx/kindle/data/&lt;/code&gt;即可，频率和上面一样，但时间要推迟一点，比如&lt;code&gt;0 16 */3 * *&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2 id=&#34;常见问题&#34;&gt;
     &lt;a href=&#34;#%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98&#34; class=&#34;anchor&#34;&gt;
@@ -252,18 +443,16 @@
 &lt;/h2&gt;
 &lt;p&gt;　　建议放在虚拟主机或VPS上，使得程序定期运行；建议只订阅少量的、精品的、长篇的RSS源，如果壳网、科学松鼠会、译言精选等，新闻性的内容还是更适合用手机和电脑阅读；建议更新频率不要太频繁，我自己设置是3天运行一次，这样我才不会因为积存了很多未读文件而干脆不去读；建议每个feed每次更新内容在5-10篇，总共不超过30篇为宜，过多也会造成阅读懒惰；如果有喜欢的RSS源但网站不输出全文，可以使用新增的强制全文输出功能（看上面的介绍）；如果遇到fivefilters不能解决的网站，可以考虑用yahoo pipes进行精确自定义处理。&lt;/p&gt;
 &lt;p&gt;　　希望所有的kindle用户都能顺利使用本程序，享受阅读的快乐。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任</title>
-    <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</link>
-    <pubDate>Sun, 24 Feb 2013 23:03:50 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</guid>
-    <description>
-        &lt;ul&gt;
+      <title>（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任</title>
+      <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</link>
+      <pubDate>Sun, 24 Feb 2013 23:03:50 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</guid>
+      <description>&lt;ul&gt;
 &lt;li&gt;该文中描述的原理仍然有效，而gaeproxy的作者已经在项目主页、官方twitter帐号上明确说明了存在这种情况，故“作者未对公众说明”已经不存在了。&lt;/li&gt;
 &lt;li&gt;作者Max Lv在这件事上表现出来的诚恳和大度令人钦佩，且已经在项目主页上放上了我原文的链接，所以特将原文移动至此，原地址仅放上我对原理的解释，不再有较为激进的内容。&lt;/li&gt;
 &lt;li&gt;对我的文章给作者带来的一些误解表示歉意。&lt;/li&gt;
@@ -293,18 +482,16 @@
 　　也许有人不同意，免费为你提供服务，你放下筷子还骂娘？殊不知信息权力已经成为一种真正可以影响社会的权力，比如google，它免费为世界提供Gmail服务，虽然我们没有支付任何费用，但它有义务保障用户的数据和隐私安全，而且有义务接受全世界各种眼光（包括黑客）的监督；比如国内的很多商业和半商业网站，明文存储的密码给无数人带来了损失，正是因为信息权力不受监督所致——一方面是政府要求明文存储密码的权力，一方面是网站安全流程设计上的权力，均不受公众监督。&lt;strong&gt;任何不受监督的权力必然导致腐败，即使这种腐败是一种极为特别的形式——掌握权力者本身甚至可能并未参与，但绝不意味着他可以置身世外&lt;/strong&gt;。在开源领域，作者的代码虽然已经公开，但仍有责任向公众介绍软件的机制，特别是涉及隐私、涉及代码外黑箱的部分。&lt;br&gt;
 　　在gaeproxy这个软件的问题上，作者从未积极地向公众介绍其“https代理”功能的原理，而且一直严重这一误导性的名称，并且在开源的代码外架设有验证服务器、代理服务器，这是多个黑箱，其中有一个留有陷阱就会让数万用户产生不可估量的损失。即使作者本身不参与窃取隐私的行动，这种不透明的流程仍然可能被人破解及利用。实际上了解到这个软件使用的第三方代理地址易如反掌，而一旦攻破这些VPS，获取代理的log后就能得到不少有价值的隐私信息，如果进一步将这些代理服务器用于中间人攻击，后果不堪设想。&lt;br&gt;
 　　&lt;strong&gt;即使我们无比相信开源软件的作者，我们也无法相信不受监督的权力。请将自由还给自由软件的用户。&lt;/strong&gt;&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>（新版）对gaeproxy的“https代理”功能之分析和说明</title>
-    <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</link>
-    <pubDate>Sat, 23 Feb 2013 16:39:50 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</guid>
-    <description>
-        &lt;ul&gt;
+      <title>（新版）对gaeproxy的“https代理”功能之分析和说明</title>
+      <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</link>
+      <pubDate>Sat, 23 Feb 2013 16:39:50 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</guid>
+      <description>&lt;ul&gt;
 &lt;li&gt;经过我旧版文章分析后，gaeproxy的作者Max Lv很诚恳和大度地在项目主页和官方twitter帐号上解释了“https代理”功能，并将本地址作为说明放在项目主页上，故我将较为耸人听闻的旧版移至另一地址，在本地址重做了一份简单的说明。&lt;/li&gt;
 &lt;li&gt;对我的文章给作者带来的一些误解表示歉意。&lt;/li&gt;
 &lt;li&gt;再次声明，我相信作者从未也永远不会谋求窃取/篡改用户数据，作者提供的该功能是基于善意，我个人只是指出整个流程中的一个安全风险，并希望所有用户都有所了解之后自己选择是否要使用。&lt;/li&gt;
@@ -313,19 +500,9 @@
 &lt;p&gt;　　说明1：gaeproxy的“https代理”功能&lt;br&gt;
 　　该功能实际上是将https的请求和回应通过作者提供的代理服务器来进行代理，原理如下：&lt;br&gt;
 　　没有打开“https代理”功能时，所有的流量都通过goagent服务器端，而goagent服务器端是部署在google appengine（GAE）上的，在客户和服务器之间，只有google的服务器存在，这个过程中只要你信任google的服务器，就是相对安全的。如图：&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/gaeproxy-analysis-01.png&#34; 
-    alt=&#34;gaeproxy-analysis-01&#34; 
-     
-    width=625 
-    height=&#34;725&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/gaeproxy-analysis-01.png&#34; alt=&#34;gaeproxy-analysis-01&#34;  width=625 height=&#34;725&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　打开“https代理”功能时，https流量（往往是敏感数据，不过会被加密，并非明文）会通过作者提供的服务器代理，而不经过goagent的服务器端，这时候如果有人攻破了作者提供的服务器，在其上进行中间人欺骗，或者解密用户与目的服务器交换的数据（并非完全不可能），会给用户造成无法估量的损失。如图：&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/gaeproxy-analysis-02.png&#34; 
-    alt=&#34;gaeproxy-analysis-02&#34; 
-     
-    width=617 
-    height=&#34;725&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/gaeproxy-analysis-02.png&#34; alt=&#34;gaeproxy-analysis-02&#34;  width=617 height=&#34;725&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　说明2：风险所在&lt;br&gt;
 　　如上文所述，典型的goagent架构全程只通过google所维护的服务器来代理，虽然由于gae不支持https connect，所以在google的服务器上https请求会被解码并重编码（我理解如此，未必正确），所以不管是PC还是android上访问https网站，都需要导入证书。&lt;br&gt;
 　　而gaeproxy作者提供的https代理不经过google的服务器，而是经过作者自己提供并维护的服务器，考虑到人力物力上的差距，作者维护的服务器在安全性上不如google的服务器来得可信，这就是我们所担心的。&lt;/p&gt;
@@ -334,18 +511,16 @@
 　　实际上goagent的作者也承认，PC上典型的goagent架构也是不安全的，我们只是信任google的维护能力而已，并不是说goagent就是安全的。&lt;br&gt;
 　　实际上翻墙的方法无非两种，一种是通过各类代理，其中加入了一道甚至几道服务器后，信息被窃取/篡改的可能性显然会增加；另一种是通过对网络协议的修改，如西厢计划等小众方案，由于需要使用别人编写的软件，一样存在风险。没有一种翻墙方式是不增加信息被窃取/篡改的风险的，只能说一定程度上降低了被GFW窃取/篡改的风险而已。&lt;/p&gt;
 &lt;p&gt;　　&lt;strong&gt;总结：既然gaeproxy的作者明示了“https代理”功能的原理，我对这个软件及其服务并无进一步的意见，我推荐大家继续使用这个软件。就我个人而言，我不会继续使用“https代理”这个功能，但如果你选择继续使用，风险并没有多么可怕。&lt;/strong&gt;&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题</title>
-    <link>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</link>
-    <pubDate>Tue, 17 Apr 2012 00:33:21 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</guid>
-    <description>
-        &lt;p&gt;　　当windows系统（本文以win7为例）通过数字方式（HDMI或DVI）连接显示器/电视机时，会通过显卡驱动读取&lt;a href=&#34;http://zh.wikipedia.org/zh/EDID&#34;&gt;EDID&lt;/a&gt;数据，该数据会告知系统该显示设备的最佳及支持的分辨率和刷新率。&lt;br&gt;
+      <title>自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题</title>
+      <link>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</link>
+      <pubDate>Tue, 17 Apr 2012 00:33:21 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</guid>
+      <description>&lt;p&gt;　　当windows系统（本文以win7为例）通过数字方式（HDMI或DVI）连接显示器/电视机时，会通过显卡驱动读取&lt;a href=&#34;http://zh.wikipedia.org/zh/EDID&#34;&gt;EDID&lt;/a&gt;数据，该数据会告知系统该显示设备的最佳及支持的分辨率和刷新率。&lt;br&gt;
 　　如果这个值正确，那么一切正常，糟糕的是有时候这个值并不正确……我买了一台&lt;a href=&#34;http://www.360buy.com/product/481852.html&#34;&gt;康佳LED32E320PD&lt;/a&gt;，国产电视再一次向我证明了国货是没有下限的……该电视通过HDMI连接电脑后，自动的分辨率是——1360x768@6Hz。我没打错，1360，以及6Hz。&lt;br&gt;
 　　而它的说明书上，清清楚楚地写着最佳分辨率1366x768@60Hz。&lt;/p&gt;
 &lt;!--description--&gt;
@@ -365,18 +540,16 @@
 &lt;li&gt;然后……就好了。有人说重启后或重连后需要重装驱动，经我实验似乎不存在这个问题。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;　　再次提醒，如果想把这个方法用于超频显示器，后果自负。顺便吐槽一下中文的技术论坛和帖子，里面似乎懂的人/似乎做成功的人，只字不提具体方法，都是说“用那个inf的方法”之流；不懂的人胡说八道，却装得亲自试验过一般。我从CDMA手机的GPS问题开始就彻底不信任中文的技术帖子（他们认为星图文件的更新服务器选&amp;quot;us&amp;quot;还是&amp;quot;cn&amp;quot;对GPS性能有根本影响，而经我测试两个选项下到的数据完全一样，MD5都一样）&lt;strong&gt;绝大多数中文的技术论坛上不成完整教程的短篇文字都是胡扯，要么是胡编，要么没有经过原理分析，几乎和跳大神一样，以心理作用代替实验结果&lt;/strong&gt;。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>十年十选——ACG动人一刻</title>
-    <link>https://blog.williamgates.net/2010/12/top-10-acgs-of-10-years/</link>
-    <pubDate>Tue, 14 Dec 2010 15:17:25 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2010/12/top-10-acgs-of-10-years/</guid>
-    <description>
-        &lt;p&gt;　　迫于百合C版的自发十年总结风潮，我也决定来写一个十年十大最动人ACG作品。不用说，是用我个人（怪异的）标准，以我个人接触过（极少的）ACG作品为范围，非常不权威。说到底我只不过是被勾起了兴趣，自己想写而已。文字对于很多人来说是记录回忆的过程，对我来说，本身就是产生感动和回忆的手段。&lt;br&gt;
+      <title>十年十选——ACG动人一刻</title>
+      <link>https://blog.williamgates.net/2010/12/top-10-acgs-of-10-years/</link>
+      <pubDate>Tue, 14 Dec 2010 15:17:25 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2010/12/top-10-acgs-of-10-years/</guid>
+      <description>&lt;p&gt;　　迫于百合C版的自发十年总结风潮，我也决定来写一个十年十大最动人ACG作品。不用说，是用我个人（怪异的）标准，以我个人接触过（极少的）ACG作品为范围，非常不权威。说到底我只不过是被勾起了兴趣，自己想写而已。文字对于很多人来说是记录回忆的过程，对我来说，本身就是产生感动和回忆的手段。&lt;br&gt;
 　　说是动人一刻，更准确的说是有动人一刻的作品，因为我不想明确地评选十大镜头；说是动人，并不一定是萌、燃或者感动，只是“心头一动”的感觉。排名不分先后（尽量按从旧到新排列），有不同意见，欢迎吐槽，不接受拍砖。&lt;/p&gt;
 &lt;p&gt;　　一、秋之回忆（Gal2000）&lt;br&gt;
 　　这是我玩过的第一个Gal，大约在02年前后。现在去看维基的Memories Off页面，才发现当时这作品中就充斥着现在已经用烂的模式化设定，体弱的萌妹、活泼的御姐、强气的转校生之类，都无非是一个设定而已——如果不是翻阅维基，我基本上已经忘了她们的存在。但是只有每天陪伴你上学的唯笑和选错了线就会害死你的前女友彩花，至今我都记得她们的样子，她们的全名。&lt;br&gt;
@@ -419,18 +592,16 @@
 　　&lt;a href=&#34;/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/&#34;&gt;这是我看过秒速5后写下的&lt;/a&gt;，听着主题歌，痛哭流涕。的确存在刻意的催泪、虐心作品，的确存在刻意描绘普通人不能抵抗世界的生活故事，但是将这样的故事用我们所爱的动漫来讲述，由新海诚来讲述，未免过于残酷。因为故事太过真实，因为叙事太过优秀，因为那淡淡的哀伤太过甜美而绝望，这部戏是我最无法接受却也最喜欢的ACG作品之一。&lt;br&gt;
 　　“若是一切可以重来/那我一定会赶到你身边/我已然别无所求/你才是我最重要的唯一”。似乎这又是一个关于放弃和选择的爱情故事，只不过选择的不是童话，放弃的不是正常生活，但是为什么每次听到这首歌，都赶到无以名状的痛苦呢。&lt;/p&gt;
 &lt;p&gt;　　十年十选，只不过是自己体验过的极少作品中的极少部分。我不想推荐什么，我只是记录下ACG带给我的心灵旅程。谢谢你们，整日研究如果赚宅男更多钱的ACG业者们，谢谢你们给了我们，一段段精彩的梦。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>笑着说我一无所有——再看School Rumble</title>
-    <link>https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/</link>
-    <pubDate>Thu, 24 Dec 2009 22:50:16 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/</guid>
-    <description>
-        &lt;p&gt;　　在圣诞夜，终于看完了School Rumble的漫画。再一次投身2-C，再一次回到那喧嚣的校园，再一次，为我们共同存在于纸上的青春，泪流满面。&lt;/p&gt;
+      <title>笑着说我一无所有——再看School Rumble</title>
+      <link>https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/</link>
+      <pubDate>Thu, 24 Dec 2009 22:50:16 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2009/12/school-rumble-youth-is-fighting-for-nothing/</guid>
+      <description>&lt;p&gt;　　在圣诞夜，终于看完了School Rumble的漫画。再一次投身2-C，再一次回到那喧嚣的校园，再一次，为我们共同存在于纸上的青春，泪流满面。&lt;/p&gt;
 &lt;p&gt;　　这一次我不会再说什么小林尽该死了，我不会再觉得结局有多么牵强——动画缺失的那一段，正好是小林尽为了这个结局而一步步埋下伏笔、一点点安排过渡的过程。我不会觉得乌丸多么的单薄、无力，而是能够理解他心中的执着与伤痛；我不会觉得天满有多么阴险，而是明白了她将自己的一切投入到对一个人的爱之上的决绝。看完了漫画后，会觉得结局根本就是顺理成章——对于荒腔走板的整部恶搞作品来说，结局诚意得令人感动——这根本不是什么腰斩结尾，而是实实在在用人物和故事安排出来的、几乎没可能逃避的命运。&lt;br&gt;
 　　是的，从一开始就设定好的个性使然，其中每个人物选择这样的过程、这样的结局几乎都是必然的。小林尽在后记中提到，他按自己的思想去扮演每一个角色，去设想他们到底会怎么做，然后再形成剧情——但有两个人例外，那就是天满与播磨。他们俩被设定成无可救药、无法改变，永远不可能改掉那天下无敌的误会和愚蠢，也永远不可能改变那坚如磐石的纯真和专情。他们是超越作者意志的存在，用作者的话说，是“让我放心的主角”。因为有他们在，因为有这样纠结的单恋关系，结局几乎是一定的。&lt;br&gt;
 　　是啊，这样的结局是注定的——不论是主角、配角，乃至路人，不管是主动的、被动的、别扭的、直率的，心中的希望几乎都没有实现，心中的恋情几乎都没有结果，终于明白了喜欢的感情的八云，最终未能转身走开的爱理，还有无数纠结和悲剧的人们，没有几个人能童话般幸福地生活在一起。&lt;br&gt;
@@ -440,29 +611,17 @@
 &lt;p&gt;　　即使只有一次也好，真的好想和他们站在一起，好想成为他们喧嚣的背景，一起经历那硝烟弥漫的运动会，真刀真枪的模拟战，向着朝阳奔跑的海滩上的人群……这个班上有大小姐、武道家的儿子、公共浴室老板的女儿和没用的小混混，但从来没有人说“我去告诉老师”或者“让我当XXX官的爸爸来跟你谈”，一切的分歧、一切的不爽，卷起袖子，来一场赌上名誉的对决吧——只用青春的热血和激情，还有愚蠢——但是想到什么都能比赛、什么都不可以服输的激情，真的希望自己就是那其中的一人，哪怕只是一次，哪怕只是配角，哪怕不是最后的胜利者——这样的青春，你不曾梦想过么？&lt;br&gt;
 　　“我曾经问个不休/你何时跟我走/可你却总是笑我/一无所有/我要给你我的追求/还有我的自由/可你却总是笑我/一无所有”，我看完这部漫画，不知为什么就想到了这首歌。是啊，我一无所有，为什么你还要飞跃半个地球来追寻？是啊，我一无所有，因为我把所有的人生都投注在了对一个人的执着。小林尽在后记中说“把自己的一直贯彻到最后是很重要的，如果要谈恋爱，就要拿出这种干劲。这部作品就是要表达出这种想法。”我们是不是可以这样理解，作者要说的意思就是，虽然未必有好的结果，虽然必然要面对失败，但是青春就是顽固到愚蠢的执着，青春就是永不言败的勇气，青春的意义就在于敢于笑着说我一无所有——然后踏上下一次的旅程。&lt;/p&gt;
 &lt;p&gt;　　这个圣诞夜，动漫群的朋友们大多过得比较冷清。当我一个人回到家煮饺子吃饭的时候，不禁有些感伤。仔细一想，那些一起搞活动、一起吃饭、一起唱歌的朋友们，很多已经离开南京，遍布天涯海角，想要组织一次团吃都那么困难。但是青春就是充满了离别和感伤，也充满了回忆和对未来的向往——我们都还年轻，我们都可以笑着说，我们一无所有。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/school-rumble-youth-is-fighting-for-nothing.jpg&#34; 
-    alt=&#34;school-rumble-youth-is-fighting-for-nothing&#34; 
-     
-    width=490 
-    height=&#34;754&#34;  /&gt;&lt;/p&gt;
-
-    </description>
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/school-rumble-youth-is-fighting-for-nothing.jpg&#34; alt=&#34;school-rumble-youth-is-fighting-for-nothing&#34;  width=490 height=&#34;754&#34; /&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
-    <title>秒速5厘米：飞向云端的初恋，随风飘落的初恋，你选哪一个？</title>
-    <link>https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</link>
-    <pubDate>Sun, 21 Dec 2008 00:01:03 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-01.jpg&#34; 
-    alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-01&#34; 
-     
-    width=500 
-    height=&#34;707&#34;  /&gt;&lt;/p&gt;
+      <title>秒速5厘米：飞向云端的初恋，随风飘落的初恋，你选哪一个？</title>
+      <link>https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</link>
+      <pubDate>Sun, 21 Dec 2008 00:01:03 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2008/12/happy-ending-of-first-love-or-keep-it-as-memory/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-01.jpg&#34; alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-01&#34;  width=500 height=&#34;707&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　不知道这是不是人类第一部根据主题歌而写的电影。&lt;/p&gt;
 &lt;!--description--&gt;
 &lt;p&gt;　　看完之后我多么想说，新海诚先生，你错了。我多么想当一次政工干部，我多么想告诉你，你的立意不高，你的故事不积极向上，你让我们——几乎是所有的观众——看完了觉得很郁闷。&lt;br&gt;
@@ -470,30 +629,15 @@
 　　新海诚先生，你创造的星海中的故事，用无法逾越的距离来告诉我们心灵的距离可以超越空间的隔阂，自始至终，我们看到的都是相信，都是坚持，都是跨越那无尽距离的努力；你演绎的云端的传奇，让我们看到了为了约定而跨越不可能的少年豪情，我们还是看到了相信，坚持，和跨越世界的鸿沟的努力。悲剧也好团圆也好，分离也好拥抱也好，你给我们的总是两个字，希望。&lt;br&gt;
 　　但是现在，你竟然要用你的作品来展现那现实的残酷——不在于失败，错过或者颓废，而在于无奈，放弃和绝望。&lt;br&gt;
 　　我知道表现现实一点也不能妨碍你的作品成为佳作，我知道的。但我总觉得，动漫应该是我们的梦，应该是青春的梦想。纵使不能实现，它也应该是引领我们做梦的精灵，而不是唤醒我们梦想的闹钟。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-02.jpg&#34; 
-    alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-02&#34; 
-     
-    width=500 
-    height=&#34;338&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-02.jpg&#34; alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-02&#34;  width=500 height=&#34;338&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　也许你要解释为，正是因为有这样纯真的回忆，那自己无法言说、满溢于信纸而又仅用一个字就能表达的初恋心情，所以人生——哪怕是小人物灰暗和平凡的、无奈和绝望的人生——也才会拥有色彩。&lt;br&gt;
 　　而我痛苦地感到，正是因为有这样纯真地令人痛心的回忆，人生的每一秒，每一个不那么美好不那么色彩斑斓的日子，都才会那样追忆那永不回来的年少，才会那样悔恨没有说出口的心意，才会显得愈发痛苦。&lt;br&gt;
 　　你看到的是擦肩而过的人，因为永远无法得到而显得那样的美好；我看到的是经历过的青春，却因为软弱和放弃，而追悔一辈子的痛苦。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-03.jpg&#34; 
-    alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-03&#34; 
-     
-    width=500 
-    height=&#34;328&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-03.jpg&#34; alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-03&#34;  width=500 height=&#34;328&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　跨越日本的距离，在荒野中晚点的列车，这些的确会打击年少的心，也许正是因为这样的痛苦才让他们明白要永远在一起有多么困难，也让他们没有交出给对方的信，没有说出心中的告白。但是这些距离并非不可超越的，它们远不是以数光年以外的星空，也不是云端之上的世界，他们大可以考一样的大学，在同一个城市工作。真正让他们远隔天边的，是心。&lt;br&gt;
 　　早有人说新海诚的作品都是关于距离的，光年的距离，世界的距离，这次是，心的距离。虽然几乎不可能是新海诚的原意，但我认为，秒速5厘米，是樱花飘落的速度，也是心灵，爱情，随风飘落的速度。&lt;br&gt;
 　　与前两部作品合起来看，这次的回答更加残酷而讽刺——他曾经努力告诉过我们，心的距离可以超越一切，包括光年，包括世界的缝隙，包括生死——但是现在他要告诉我们，不好意思，我忘了，有一样东西不能超越，那就是现实的人生。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-04.jpg&#34; 
-    alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-04&#34; 
-     
-    width=500 
-    height=&#34;328&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/happy-ending-of-first-love-or-keep-it-as-memory-04.jpg&#34; alt=&#34;happy-ending-of-first-love-or-keep-it-as-memory-04&#34;  width=500 height=&#34;328&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　人生中短短的交集让他们拥有了挥之不去的思念，但是无奈的分离，把他们各自抛入了人生的洪流——没有选择，没有停靠，只有马不停蹄，无法停下来寻找，寻找与对方再一次的交集。是的，我说起来很轻松，他们可以考一样的大学，可以在同一个城市工作，定居。但是现实的生活并没有给你这样的机会，从他们在枯萎的樱花树下相吻那一刻，幼小的心灵就已经屈服于整个无奈和随波逐流的人生。&lt;br&gt;
 　　所以，飞向云端追寻幸福的少年之梦，随着樱花飘落的初恋回忆，你选哪一个？你一定会选前者，但是新海诚叹着气要告诉我们的就是，这由不得你，你没有机会选择。&lt;br&gt;
 　　是的，我们哪有机会选择啊，看起来那么轻易的事情，看起来“只要奋斗就好了嘛”的回答，在人生的河流中，又有多少次就在那快要实现的时候会变成失望，甚至一生的遗憾。即使如罗密欧与朱丽叶般至死不渝——如果那样年幼的孩子能做到——结局也未必就是团圆收场。&lt;/p&gt;
@@ -507,23 +651,16 @@
 我已然别无所求&lt;br&gt;
 你才是我最重要的唯一&lt;/p&gt;
 &lt;/blockquote&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>School Rumble，用喜剧纪念青春</title>
-    <link>https://blog.williamgates.net/2008/11/school-rumble-the-tragicomedy-of-our-youth/</link>
-    <pubDate>Tue, 18 Nov 2008 23:25:37 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2008/11/school-rumble-the-tragicomedy-of-our-youth/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/school-rumble-the-tragicomedy-of-our-youth.jpg&#34; 
-    alt=&#34;school-rumble-the-tragicomedy-of-our-youth&#34; 
-     
-    width=500 
-    height=&#34;375&#34;  /&gt;&lt;/p&gt;
+      <title>School Rumble，用喜剧纪念青春</title>
+      <link>https://blog.williamgates.net/2008/11/school-rumble-the-tragicomedy-of-our-youth/</link>
+      <pubDate>Tue, 18 Nov 2008 23:25:37 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2008/11/school-rumble-the-tragicomedy-of-our-youth/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/school-rumble-the-tragicomedy-of-our-youth.jpg&#34; alt=&#34;school-rumble-the-tragicomedy-of-our-youth&#34;  width=500 height=&#34;375&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　少年的梦，终究只能是青春的，喧闹的，虽然温暖而可爱，却不能实现&lt;br&gt;
 　　少年的梦，就是让你老了之后回忆起来的时候，微笑一下：我们还有过那样的岁月啊&lt;/p&gt;
 &lt;p&gt;　　School Rumble到底是悲剧还是喜剧？相信没有多少人在看到结尾之前觉得这不是喜剧，但我在看了一半的时候，就曾经骂过作者，这不是把少年的梦想和执着当作笑柄么，那么努力却不能成功的少年，很可笑么？&lt;br&gt;
@@ -555,23 +692,16 @@
 　　但我又是多么的为你们伤心，为你们流泪——&lt;/p&gt;
 &lt;p&gt;　　你们就是我们的梦想，欢乐，喧闹，信仰，顽固，和哀愁&lt;br&gt;
 　　你们就是我们曾经在喧闹的校园中，一去不回而又终生难忘的，青春啊&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>趁年轻，赶紧摇</title>
-    <link>https://blog.williamgates.net/2008/02/like-a-rolling-rock-as-early-as-possible/</link>
-    <pubDate>Tue, 05 Feb 2008 23:03:33 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2008/02/like-a-rolling-rock-as-early-as-possible/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/like-a-rolling-rock-as-early-as-possible.jpg&#34; 
-    alt=&#34;like-a-rolling-rock-as-early-as-possible&#34; 
-     
-    width=500 
-    height=&#34;440&#34;  /&gt;&lt;/p&gt;
+      <title>趁年轻，赶紧摇</title>
+      <link>https://blog.williamgates.net/2008/02/like-a-rolling-rock-as-early-as-possible/</link>
+      <pubDate>Tue, 05 Feb 2008 23:03:33 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2008/02/like-a-rolling-rock-as-early-as-possible/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/like-a-rolling-rock-as-early-as-possible.jpg&#34; alt=&#34;like-a-rolling-rock-as-early-as-possible&#34;  width=500 height=&#34;440&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　高旗的声音响起，我差点掉下了眼泪。&lt;/p&gt;
 &lt;p&gt;　　时隔多年，曲子还是那些曲子，李延亮还是李延亮，但是高旗已经不是那个高旗，超载已经不是那个超载。&lt;br&gt;
 　　我是在高中同座位，一个疯狂的摇滚迷推荐下听了《超载》的，说实话，一开始并不是很喜欢。我不知道不同的人喜欢上摇滚的历程是否不同，但在我，我一开始是很厌恶，然后是有兴趣，再然后是欲罢不能。转折点，就是这张《超载》。&lt;br&gt;
@@ -592,23 +722,16 @@
 　　我为高旗和超载的不再年轻而感伤，但我更为他们坚持了摇滚的心而感到高兴。&lt;/p&gt;
 &lt;p&gt;　　刚好听完一整张专辑，写完了这篇文章。东扯西扯从高旗的嗓子说到了摇滚的心，是因为看到了最近DlzM的那篇文章，再加上想到同样是老摇滚人的汪峰，在豆瓣上被人痛骂为”最后的武器就是一颗敢于拿着这种东西来骗钱的勇敢的心“（我并不赞同，我觉得汪峰即使是现在的专辑在中国摇滚界也算有一定水平）。我真的不觉得摇滚人的老去、趋于商业和流行化是多么悲惨的事情，同样是音乐，摇滚并不是干净和神圣的代名词，也不比其他音乐要高级、要伟大；但如果转型过程中不能坚守那颗摇滚的心，真正愧对的不仅是老乐迷，不仅是自己摇滚人的那个标签，更是自己曾经的岁月，自己年少的激情，那些自己曾经最想要通过摇滚之心延续下来的东西。&lt;br&gt;
 　　要说明的是，起这个标题，并不暗示”老了就滚“的意思，只是偶然想到觉得有趣，就用了。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>再见哈利波特，再见我们的童年</title>
-    <link>https://blog.williamgates.net/2007/08/goodbye-harrypotter/</link>
-    <pubDate>Thu, 16 Aug 2007 20:30:50 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2007/08/goodbye-harrypotter/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/goodbye-harrypotter.jpg&#34; 
-    alt=&#34;goodbye-harrypotter&#34; 
-     
-    width=350 
-    height=&#34;500&#34;  /&gt;&lt;/p&gt;
+      <title>再见哈利波特，再见我们的童年</title>
+      <link>https://blog.williamgates.net/2007/08/goodbye-harrypotter/</link>
+      <pubDate>Thu, 16 Aug 2007 20:30:50 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2007/08/goodbye-harrypotter/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/goodbye-harrypotter.jpg&#34; alt=&#34;goodbye-harrypotter&#34;  width=350 height=&#34;500&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　也许这样说并不妥当，毕竟我是从高一时，哈一电影上映那年才开始看哈利波特的，把前四本借来看了一遍，看完之后当即去书店买来，又看了一遍。从高一到大四，应该不算是小孩子了，但我要说的不是年龄上的童年，而是那段我们拥有天真的幻想，愿意相信奇迹的岁月。&lt;br&gt;
 　　我承认我订购太晚，从北京回家太迟，英文阅读太慢，以至于到现在才读完第7本。让我们来说点什么吧，不管是剧情，还是感想。&lt;/p&gt;
 &lt;!--description--&gt;
@@ -620,23 +743,16 @@
 　　综合来看，罗琳缺少的不是“讲故事”的能力，而是对悬疑的解释能力——那些本以为有多么深层含义的伏笔，到最后原来就是表面看起来那个样子——包括Lupin在开头的表现，我还以为他是叛徒呢。最后的解释弃用了很多本已埋好的伏笔，简直就像把读者心里所理解的那个答案简单地说出来，没有什么峰回路转，没有什么意料之外。罗琳还缺少控制大场面的能力，如此激动人心的战争场面被描写得像小学生打雪仗——看不出惨烈和宏伟，最后Harry和Voldemort的对决更是罗嗦了一大堆之后一击毙命，落入了俗套。&lt;/p&gt;
 &lt;p&gt;　　我是真的不愿意自己如此喜爱的作品在最后一部才意识到自己是一个儿童文学的。但我不得不承认，罗琳对整个故事的构建，让我们的童年——那个愿意相信奇迹的年纪——充满了魔法般的色彩。我真的相信这个世界上有那些不可解释的事情存在——就像书里它们存在那样理所当然。&lt;br&gt;
 　　如同很多人说过的那样，我不愿意去读完它，但又废寝忘食地读完了它。我不愿意看到这个陪伴我们成长的故事的终结，但一切就像我们不得不长大那样，我们不得不说，再见。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>Eureka——交响诗中，没有孤独</title>
-    <link>https://blog.williamgates.net/2007/03/eureka-meets-no-loneliness/</link>
-    <pubDate>Mon, 26 Mar 2007 21:06:50 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2007/03/eureka-meets-no-loneliness/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/eureka-meets-no-loneliness.jpg&#34; 
-    alt=&#34;eureka-meets-no-loneliness&#34; 
-     
-    width=500 
-    height=&#34;375&#34;  /&gt;&lt;/p&gt;
+      <title>Eureka——交响诗中，没有孤独</title>
+      <link>https://blog.williamgates.net/2007/03/eureka-meets-no-loneliness/</link>
+      <pubDate>Mon, 26 Mar 2007 21:06:50 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2007/03/eureka-meets-no-loneliness/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/eureka-meets-no-loneliness.jpg&#34; alt=&#34;eureka-meets-no-loneliness&#34;  width=500 height=&#34;375&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　看这部作品用了差不多一年时间。看前半部的时候，我怎么也想不通为什么这个英文标题可以冠以一个“交响诗篇”的日文/中文名称。但看完它的时候，我不得不感叹这名字起得伟大。&lt;br&gt;
 　　这部戏有男女主角，但我却更倾向于把它看作一个宏伟的时代剧。在片尾，当兰顿下定决心的时候提到查尔斯这样一个消失了快20集的角色，当太空中交战的背景音乐突然从Hip-Hop变成了交响乐，我突然明白，这不是一部快餐作品，这是一个时代的史诗，是一群人的传奇。&lt;br&gt;
 　　所以，这是一部不折不扣的交响诗。&lt;/p&gt;
@@ -657,23 +773,16 @@
 　　好吧，我承认我还是会为那充满节奏感的背景音乐和奋战的场面而热血沸腾的年少的孩子，我承认我还相信那些救世主、大英雄、自己的命运之类的玩意，我承认当我在写这些文字的时候，耳机里传来这部片子的原声碟震撼的声音，我不由自主地又沉浸到那英雄的故事中去了。&lt;br&gt;
 　　但这有什么不对呢？&lt;br&gt;
 　　交响诗中，有少年的热血与成长，有亚文化的律动和反叛，有佛教、巫术、神秘主义的种种谜语与彻悟，有跨越一切界限、最伟大最包容最真诚的爱情，唯独，没有孤独。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>老狼老了，青春还在</title>
-    <link>https://blog.williamgates.net/2007/03/lao-lang-your-song-our-youth/</link>
-    <pubDate>Thu, 08 Mar 2007 22:31:33 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2007/03/lao-lang-your-song-our-youth/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/lao-lang-your-song-our-youth.jpg&#34; 
-    alt=&#34;lao-lang-your-song-our-youth&#34; 
-     
-    width=500 
-    height=&#34;500&#34;  /&gt;&lt;/p&gt;
+      <title>老狼老了，青春还在</title>
+      <link>https://blog.williamgates.net/2007/03/lao-lang-your-song-our-youth/</link>
+      <pubDate>Thu, 08 Mar 2007 22:31:33 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2007/03/lao-lang-your-song-our-youth/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/lao-lang-your-song-our-youth.jpg&#34; alt=&#34;lao-lang-your-song-our-youth&#34;  width=500 height=&#34;500&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　看到douban上提到老狼《北京的冬天》这张新专辑，是在网上发售后24小时以内。立刻冲上Joyo，发现我三年未登录的账号还在，毫不犹豫地点了购买。不为什么，就是冲动。&lt;br&gt;
 　　拿到专辑，第一眼的感觉就是老狼老了，比《晴朗》中的照片又要老了一些，甚至可称作“苍老”了。按下播放键，耳机里传来我不大喜欢的电子配器，但几秒钟后，我就听到了那不会改变的声音。&lt;/p&gt;
 &lt;!--description--&gt;
@@ -682,23 +791,16 @@
 　　当年他起这个艺名的时候，也许有一点“装老”的意味，但现在的他应该被称作那种少有的“越老越有味道的男人”，可以算是应了老狼这个名号。听他唱情歌对唱，没有任何“装嫩”的感觉，却比《青春无悔》那样的对唱中的伤感和无奈，多了一份岁月凝练的成熟和温情；听他唱八十年代的老校园歌曲，没有怀旧的感觉，却感到“这就是我们的青春”。&lt;br&gt;
 　　没错，这就是我们的青春，失去了它的人不会因此而感伤落泪，却只是沉浸在真切的回忆中；经历它的人不会感到苍老的回忆和说教，却充满心头的共鸣。正如有人说的“老狼是不会令我惊喜也不会令我失望的歌手”，他就是那样，当他老了，当他的嗓音老了，当他的唱功提升了，当他的声音中增加了成熟的味道和温软的气息，他还是在唱我们的青春，我们每一个人经历过的，正在经历的青春，甚至下一代人，将要经历的青春。他的声音没有随着他年龄的增长而老去，他永远唱的都是那二十多岁的，那年少的忧愁，充满希望的喜悦，改变一切的激情，他唱的是那永远不会老去的，每一代人的青春。&lt;br&gt;
 　　老狼老了，嗓音老了，他却一直唱着不老的青春，我们每一个人的青春。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>再见列宁</title>
-    <link>https://blog.williamgates.net/2007/02/goodbye-lenin/</link>
-    <pubDate>Sun, 11 Feb 2007 17:19:38 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2007/02/goodbye-lenin/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/goodbye-lenin.jpg&#34; 
-    alt=&#34;goodbye-lenin&#34; 
-     
-    width=566 
-    height=&#34;800&#34;  /&gt;&lt;/p&gt;
+      <title>再见列宁</title>
+      <link>https://blog.williamgates.net/2007/02/goodbye-lenin/</link>
+      <pubDate>Sun, 11 Feb 2007 17:19:38 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2007/02/goodbye-lenin/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/goodbye-lenin.jpg&#34; alt=&#34;goodbye-lenin&#34;  width=566 height=&#34;800&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　看了这部片子就知道自己又给自己布置了个作业，必须写点什么，想不到题目就用这个最有震撼力的片名来代替了。&lt;br&gt;
 　　当传统的制度在一夜间倾覆，当自己的母亲在对传统祖国的梦境中沉睡，年轻的主人公选择了撒谎，一个又一个越来越大的谎言，最后实际上已经达到了片中说的“把整个柏林都装修一遍”的效果。而他的母亲也在半信半疑中、在真相已经揭开一角之时，安然离去了。&lt;br&gt;
 　　这是一部好片子，它好就好在，这是一部各取所需的片子。&lt;/p&gt;
@@ -714,18 +816,16 @@
 　　二是她半信半疑，怀着对过去美好的回忆，也怀着对“一切都没有改变”的失望，在国庆的焰火照耀中，黯然睡去。从最后她挣扎着从床上探起身想要看那些焰火，可以看出来。与其说她在好奇，不如说她在向往，向往新的生活，如同楼顶上的那一对青年，他们的心其实是一样的。&lt;br&gt;
 　　三是她已经完全了解了真相，但是基于对儿子的爱以及不知道什么原因(被制度压抑过久后的习惯缄默？)而没有说出来，于是她了解了一切，却又不愿意接受新的历史，含着与社会格格不入的痛苦，也报有对新时代的期冀，离开了。&lt;/p&gt;
 &lt;p&gt;　　这些都有道理。但这是我第一次在看完一部电影后想不出哪个结论是对的，也许这就是这部片子的精髓所在，时代大潮中，旧的也值得人们去温情地忆起，新的也吸引人们去追求，新旧交替之间的奇景，是每一个人都无法分辨对错、无法知道自己该站在墙的哪一边的。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>社会的良心——听潘根老师讲座有感</title>
-    <link>https://blog.williamgates.net/2006/12/conscience-of-the-society/</link>
-    <pubDate>Thu, 21 Dec 2006 22:35:35 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/12/conscience-of-the-society/</guid>
-    <description>
-        &lt;p&gt;　　曾经听说“知识分子是社会的良心”，颇不以为然，觉得知识分子做好本职工作即可，除非是社会学、政治学家，否则颇不必为“社会良知”“重视教育”之类的事情走与呼。但前日听得潘根老师一席讲座，虽时间不长、所言具体内容有限，却受益良多，方才懂“社会的良心”的涵义。&lt;br&gt;
+      <title>社会的良心——听潘根老师讲座有感</title>
+      <link>https://blog.williamgates.net/2006/12/conscience-of-the-society/</link>
+      <pubDate>Thu, 21 Dec 2006 22:35:35 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/12/conscience-of-the-society/</guid>
+      <description>&lt;p&gt;　　曾经听说“知识分子是社会的良心”，颇不以为然，觉得知识分子做好本职工作即可，除非是社会学、政治学家，否则颇不必为“社会良知”“重视教育”之类的事情走与呼。但前日听得潘根老师一席讲座，虽时间不长、所言具体内容有限，却受益良多，方才懂“社会的良心”的涵义。&lt;br&gt;
 　　潘老师所讲的，是宇宙学的争论，从宇宙学的一些基本事实，讲到历史上的几个主要理论和模型，再谈到关于大爆炸假说的争论，所涉主题虽颇有专业，但讲解深入浅出，毫无跳跃、矛盾之处，让我这个文科生也能顺利理解。&lt;br&gt;
 　　在讲到数学原理的时候，我不禁出了会神，毕竟数学对我而言实在太艰涩。我从小学就喜欢读《飞碟探索》《科幻世界》之类的杂志和书，曾经梦想着能成为一个天文学者，而现在的场景，正是一位这样的学者，一位白发苍苍的老者，在冬日有些寒冷的教室中，面对着台下稀稀落落的人群，面对着不多却听得出神的学生，在高声地、精神地高颂他心中的学术观点，这不就是所谓“真正的大学”应该有的样子么？这不就是每个人梦想中的大学课堂——在来到大学后或多或少会让我们失望的梦想？&lt;/p&gt;
 &lt;!--description--&gt;
@@ -744,24 +844,17 @@
 　　讲座结束后，几位浦口百合的朋友惊讶地问我为何从鼓楼过来，我激动地向他们讲起潘老和化院的渊源，并高高扬起了凝结潘老毕生精力的著作。从潘老的口中，我听说他的书已经再版，并且被列为国家十一五重点规划教材，看到老人家激动之情，我又怎忍心告诉他，如今潘老的书作为化院的教材已经名存实亡，老师根本不屑使用，同学也自视之为累赘，甚至将其淹没在废品回收站的故纸堆里？&lt;/p&gt;
 &lt;p&gt;　　“物质能否生灭？宇宙是否有极限？一万年以后还会有争论。正确的答案只有一个。未来的自然科学不是满足于各分支学科自成体系的自恰性，而是要求在综合之后仍能自恰。科学在争论中前进。”不知为什么，每次读到这段话，都有一种荡气回肠的感觉。她写尽了一位以教书育人为毕生己任的老人，穷尽大半生，与主流大爆炸理论相争论，不为人所认可，却又从不低头的辛酸故事。&lt;/p&gt;
 &lt;p&gt;　　最后，我愿以潘老的全书后记来结束本文.&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/conscience-of-the-society.gif&#34; 
-    alt=&#34;conscience-of-the-society&#34; 
-     
-    width=599 
-    height=&#34;534&#34;  /&gt;&lt;/p&gt;
-
-    </description>
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/conscience-of-the-society.gif&#34; alt=&#34;conscience-of-the-society&#34;  width=599 height=&#34;534&#34; /&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
-    <title>光芒还是灰烬？——读余杰《我的梦想在燃烧》</title>
-    <link>https://blog.williamgates.net/2006/12/my-dream-is-burning/</link>
-    <pubDate>Fri, 08 Dec 2006 01:35:35 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/12/my-dream-is-burning/</guid>
-    <description>
-        &lt;p&gt;　　作为一个毫不害怕承认自己曾经是愤青的人，我一直非常想读余杰的书，毕竟他曾经号称是中国当代热血青年的领军人物，虽然他也许并不齿这类称号。但不知什么原因，直到我过了20岁，已经不在那么坚定的相信民族主义或者自由主义那一套，也就是说我不再那么右也不在那么左，不再那么愤世嫉俗的时候，我突然捧起了他的书，并且只用了三天就看完了一本。&lt;br&gt;
+      <title>光芒还是灰烬？——读余杰《我的梦想在燃烧》</title>
+      <link>https://blog.williamgates.net/2006/12/my-dream-is-burning/</link>
+      <pubDate>Fri, 08 Dec 2006 01:35:35 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/12/my-dream-is-burning/</guid>
+      <description>&lt;p&gt;　　作为一个毫不害怕承认自己曾经是愤青的人，我一直非常想读余杰的书，毕竟他曾经号称是中国当代热血青年的领军人物，虽然他也许并不齿这类称号。但不知什么原因，直到我过了20岁，已经不在那么坚定的相信民族主义或者自由主义那一套，也就是说我不再那么右也不在那么左，不再那么愤世嫉俗的时候，我突然捧起了他的书，并且只用了三天就看完了一本。&lt;br&gt;
 　　读着读着，我总觉得与我记忆中，概念中的那个余杰，有些不一样。一方面，他的评论确实犀利，他的眼光确实独到，他的价值观的确特立独行，但我总觉得缺了点什么，缺了点让一个杂文家之所以伟大的东西；一方面，他的意识形态明显的美国化，他对基督教文明的崇拜，却又没有详细的理论解释他为什么崇拜这种信仰，不由得让人觉得有点不快。&lt;br&gt;
 　　看到维基百科对余杰的评价，一部分人认为他是自由派的领军人物，是当代少数敢说真话、敢于直面社会现实的文人和学者；一部分人认为他已经成为一个通过文字讨好各方的谄媚文人。我觉得这两方的观点，正应了我的两个感受。&lt;br&gt;
 　　他的一些东西还是非常令我赞同的，例如对暴力文化的批判，对“儒文化是新世纪的世界道德”的批判，对高等教育的忧虑和见解，都可谓精辟。但不知是因为时间过去较久，一些时评已经失去当时的效果，还是因为我最近阅读学术著作较多，只要看到价值判断都喜欢问作者论证何在，总觉得他更倾向一个“文人”而不是“学者”，也就是说更多的诉诸主观的激情，而少有理性的推理和论证，当然这也是杂文的特点，如战斗檄文召唤热血青年们去战斗；但对于我，似乎没有那种热血沸腾的效果。&lt;br&gt;
@@ -770,18 +863,16 @@
 &lt;p&gt;　　我突然想到两个人，也许类型不同，但在青少年读者看来并无本质区别：韩寒和郭敬明。他们应该是当代年轻文人“玩个性”最典型的表现，而韩寒至少活得很好，他坦然自己玩文字，坦然自己就是要赚钱，不是写文学，他整天唠唠叨叨自己赛车的输赢，但至少还得了不少奖项，他自愿脱离那个《三重门》的自己，脱离文学，走向他向往的边缘的生活，但是他在自己的梦想中活得挺好；郭敬明就差得多了，写不出东西来还要抄，想赚钱还要遮遮掩掩，可谓连穷酸文人都算不上，成了一个让人提到就皱眉的“现象”，从一开始到现在都只是一个“现象”。&lt;br&gt;
 　　某种程度上，大众眼中的两个余杰跟这两个人也有很多相像。我宁愿阅读一个疯狂的倾诉自己内心的杂文家的书，他激烈、犀利、目空一切，他的笔尖如闪电将古树与枯木一齐点燃，我们可以嗤笑他的轻狂无知，我们可以对他的观点不屑一顾，但至少他是在说真话，敢于讲自己的真话说出来的文字，才是如余杰自己所说，是超越自己、达到理想的界限之外的一种方式。我不愿一个人写文章娓娓动听，感人至深，但却没有自己的价值判断，一切只为了讨好和迎合，只为了博取更多的同情或支持，这种人写的东西不用奢谈文学，连文字都算不上。&lt;br&gt;
 　　但是，我刚刚读了一本余杰的书，还不知道他到底是自己宣称的说真话的人，还是借着说真话的招牌讨好各方的小人。他说“我的梦想在燃烧”，我却不知道他要说的，是燃烧的光芒，还是灰烬。所以，我选择继续读下去，我觉得此人还算有点意思。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>谁来教我们法哲学？——读林立《法学方法论与德沃金》</title>
-    <link>https://blog.williamgates.net/2006/12/dworkin-the-methodology-of-law/</link>
-    <pubDate>Thu, 07 Dec 2006 22:15:09 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/12/dworkin-the-methodology-of-law/</guid>
-    <description>
-        &lt;p&gt;　　读完了林立先生的《法学方法论与德沃金》，虽未能全然理解其思想本意，也并非完全赞同其对德沃金先生的批判，但舍去具体学术问题不谈，我想到一个问题：谁来教我们法哲学？&lt;/p&gt;
+      <title>谁来教我们法哲学？——读林立《法学方法论与德沃金》</title>
+      <link>https://blog.williamgates.net/2006/12/dworkin-the-methodology-of-law/</link>
+      <pubDate>Thu, 07 Dec 2006 22:15:09 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/12/dworkin-the-methodology-of-law/</guid>
+      <description>&lt;p&gt;　　读完了林立先生的《法学方法论与德沃金》，虽未能全然理解其思想本意，也并非完全赞同其对德沃金先生的批判，但舍去具体学术问题不谈，我想到一个问题：谁来教我们法哲学？&lt;/p&gt;
 &lt;p&gt;　　作为法学专业的学生，我们大学的第一个学期就开设有法理学这门课。其出发点无疑是让我们培养起专业的法学思维方法，了解一定的法学研究方式。但综观各种法理学教材，回想当年上过的法理学课程，不由惊出一身冷汗：老师讲了多少？我们又理解了多少？&lt;br&gt;
 　　我记忆中的，确凿的大概只有一些法学基本术语、基本体系，例如不同法系的概述，不同法学观点的简单阐释等。然后很快地，我们就进入了“社会主义法学”，进入了我国的法律制度的介绍。这些课程，顶多能算“法学基础常识”（正如某些学校已经在法学专业所作的改变），而要谈“法理”，不仅老师不愿讲，学生也不能懂。&lt;br&gt;
 　　我们懵懂地接受了一些原则，却从未问过它们本身从何而来，我们坚信宪法高于其他法律，却从未问过宪法的本质，或者即便我们问到了契约论或者天赋人权，却从未把它再深入探究：为什么基于社会契约的制度就是“善”的？我们热烈地讨论“恶法是不是法”，却只是从不成体系的个人道德观念出发，从未从语义学和法理学上思考过，什么是法，法有着怎样的本质？甚至，我们为了废除死刑、为了期待可能性而呼号，却从未想过，是什么力量，让我们合理地将一个法律条文，适用到与它相对应的案件之上(哪怕不需要任何传统意义上的“类推适用”)？&lt;br&gt;
@@ -796,18 +887,16 @@
 　　但是我们的法理学呢，我们从来只能得到口号性的回答，我们学习的理论也许并非建立在空洞的口号之上，但是我们所得到的解释，我们所坚持的一些原则所要基于的“公理”性的东西，并非罗尔斯所说人的本性和“慎思的判断”，而更多是口号，是明确无误不需证明的，却又与人类本性和自然之理毫无关系的定论。&lt;br&gt;
 　　也就是说，我们一直在这样的楼阁上建筑，它的根基何在，到底有多深，我们为什么要建筑，这一切都与我们无关，老师只管讲，我们只管记就好了。我相信马克思不是靠他的“德行”之类来传播思想的，他靠的是深入的研究和严谨的论证；我相信美国的开国先哲们也不是靠武力来推广他们的民主自由的，他们靠的是哲学和政治学的论证。而现在，作为(仅仅是被认为是)将要担负一个国家的法制建设的一代法科学生，却在他们完全不“懂”，不了然于心的基础上，在研习学术，在争论是非，他们可能今天支持这个明天支持那个，他们可能为了各种外在影响而改变自己的观点，因为他们甚至没有法哲学意义上的学术信仰。&lt;/p&gt;
 &lt;p&gt;　　写这篇文字，只是读了这本书之后感觉到，我们的法理学课程根本没有资格称得上法理学，顶多叫做法学常识，至少，它没有包摄法哲学这一最基础最本质的法学根基。也许是我才疏学浅，也许是我读书太少，到了这个年纪才明白法理学的重要性，也许有很多同学已经饱读法理学经典著作而至少可以算是了解法哲学的基本常识，那么我只能说，我太过拘泥于我看到的、听到的、感受到的周围人的现象，我只看到中国下一代法律人的极少一部分，我再次，像我一个同学做过的那样，所谓贻笑大方之家了。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>《波斯纳与法律经济分析》读后感（二）——法律经济分析的价值矛盾</title>
-    <link>https://blog.williamgates.net/2006/11/posner-law-and-economics-02/</link>
-    <pubDate>Tue, 21 Nov 2006 16:26:27 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/11/posner-law-and-economics-02/</guid>
-    <description>
-        &lt;p&gt;　　读林立先生的书，字里行间无不充满着严谨的逻辑论证和强烈的思辨气息，例如他对波斯纳先生所倡导的理论的终极价值的评价：&lt;/p&gt;
+      <title>《波斯纳与法律经济分析》读后感（二）——法律经济分析的价值矛盾</title>
+      <link>https://blog.williamgates.net/2006/11/posner-law-and-economics-02/</link>
+      <pubDate>Tue, 21 Nov 2006 16:26:27 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/11/posner-law-and-economics-02/</guid>
+      <description>&lt;p&gt;　　读林立先生的书，字里行间无不充满着严谨的逻辑论证和强烈的思辨气息，例如他对波斯纳先生所倡导的理论的终极价值的评价：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;其实问题的最终核心，一言以蔽之，就在于：波斯纳只把“社会利益”视为有据的、唯一带给人们幸福的价值，而把道德理论或传统法律中追求的价值视为虚幻的。&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -820,18 +909,16 @@
 &lt;p&gt;这种价值观的根本盲点，是先把个人追求“幸福最大化”错误地等同于“财富最大化”，把个人的经济行为误以为是人类行为的全部领域。然后，在认为“财富”即等于“幸福”之后，进到法律规范整个社会的议题后，又更进一步认为法律的目的是“社会财富总量最大化”；然而他没有提出有说服力的道理说明这些财富若没有平均为大众所享有，则为什么那么迫切、不顾一切地要这个“社会财富最大化”，急切到照顾弱势的问题丢在一边不说，侵犯个人的自尊心不说，也讲“法的安定性”弃之如敝屣(不承认人有既有的什么法定权利)，甚至最后导致波斯纳自相矛盾地连侵犯法定个人既有的财产权也在所不惜，而这一切只为了“社会财富总量最大化”，道理何在？&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;　　本文谈不上读后感，仅仅算是读书笔记而已，只是从林立先生的思考进路分析了一下法律经济分析中的价值矛盾，虽引用不少林立先生的文字，却只是我自己的论证，而未能得林先生观点之精髓，各位见笑了。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>《波斯纳与法律经济分析》读后感（一）——实证科学不是万能的</title>
-    <link>https://blog.williamgates.net/2006/11/posner-law-and-economics-01/</link>
-    <pubDate>Fri, 10 Nov 2006 20:32:15 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/11/posner-law-and-economics-01/</guid>
-    <description>
-        &lt;blockquote&gt;
+      <title>《波斯纳与法律经济分析》读后感（一）——实证科学不是万能的</title>
+      <link>https://blog.williamgates.net/2006/11/posner-law-and-economics-01/</link>
+      <pubDate>Fri, 10 Nov 2006 20:32:15 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/11/posner-law-and-economics-01/</guid>
+      <description>&lt;blockquote&gt;
 &lt;p&gt;有两样东西，我们愈经常持久地加以思索，它们就愈使心灵充满始终新鲜，不断增长的景仰和敬畏：&lt;br&gt;
 在我之上的星空和居我心中的道德法则。&lt;br&gt;
 ——康德&lt;/p&gt;
@@ -849,23 +936,16 @@
 　　其实伦理哲学、法哲学这类的东西，并不像人们认为的那样难懂。相较而言，至少不会比原子弹的造法难懂。但是有无数的人愿意去学习原子弹的造法，却不愿意理解这更贴近人类本性的理论。并不是这类理论没有说服力——只是大众长期习惯于接受实证的、数据的结论，而不愿意倾听那些更来自他们内心的、本性的东西。所以说，不是哲学难懂，也不能算是民智未开，只是对什么是“真实”的标准，被片面地理解了。我们要说的其实是在每个人心灵里的东西，它们不可以用模型、用数据来表达，但它们却绝不是不存在，绝不是不可理解、没有意义。&lt;br&gt;
 　　这些东西比原子弹威力大多了。&lt;/p&gt;
 &lt;p&gt;　　本来想严谨地写一点论文性的东西，结果写着写着变成了随感，走题到不知哪里去了。也罢也罢，下次再来讨论讨论关于波斯纳先生和林立先生的观点的问题吧。台湾学者的学术钻研、著作撰写果然认真严谨，绝非某些大陆学者凑字数的那些书能比，这本书看下来，可以写、可以思考的东西太多了，我才学疏浅，还是随便发点感想比较不容易落下笑柄，呵呵。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>H&amp;C II——关于青春，关于成长</title>
-    <link>https://blog.williamgates.net/2006/10/honey-and-clover-second-season/</link>
-    <pubDate>Mon, 23 Oct 2006 16:18:39 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/10/honey-and-clover-second-season/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/honey-and-clover-second-season.jpg&#34; 
-    alt=&#34;honey-and-clover-second-season&#34; 
-     
-    width=1024 
-    height=&#34;768&#34;  /&gt;&lt;/p&gt;
+      <title>H&amp;C II——关于青春，关于成长</title>
+      <link>https://blog.williamgates.net/2006/10/honey-and-clover-second-season/</link>
+      <pubDate>Mon, 23 Oct 2006 16:18:39 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/10/honey-and-clover-second-season/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/honey-and-clover-second-season.jpg&#34; alt=&#34;honey-and-clover-second-season&#34;  width=1024 height=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;“时光流逝，总有一天，一切都将变为回忆。&lt;br&gt;
 但是，有我，有你，有大家，只为寻找同一样东西的，那段奇迹般的岁月，&lt;br&gt;
@@ -889,41 +969,19 @@
 &lt;p&gt;　　我现在终于可以说，蜂蜜不是一部“真实的”励志片，而是一部“励志的”真实生活。它只是将每个人所必经的生活艺术化了，它不是要说教一些什么，它甚至不需要激励你什么，它只是告诉你，生活，就是这个样子。&lt;/p&gt;
 &lt;p&gt;　　我们每个人都是幸福的。因为我相信，每一个人，或多或少的，都有选择为了自己心中最重要的事物，而交出整个人生的权利。&lt;br&gt;
 　　就像他们一样。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>因为，全世界都在看着</title>
-    <link>https://blog.williamgates.net/2006/07/the-whole-world-is-looking-at-you/</link>
-    <pubDate>Mon, 10 Jul 2006 15:30:05 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/07/the-whole-world-is-looking-at-you/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-01.jpg&#34; 
-    alt=&#34;the-whole-world-is-looking-at-you&#34; 
-     
-    width=480 
-    height=&#34;375&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-02.jpg&#34; 
-    alt=&#34;the-whole-world-is-looking-at-you&#34; 
-     
-    width=480 
-    height=&#34;324&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-03.jpg&#34; 
-    alt=&#34;the-whole-world-is-looking-at-you&#34; 
-     
-    width=283 
-    height=&#34;400&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/the-whole-world-is-looking-at-you-04.jpg&#34; 
-    alt=&#34;the-whole-world-is-looking-at-you&#34; 
-     
-    width=480 
-    height=&#34;325&#34;  /&gt;&lt;/p&gt;
+      <title>因为，全世界都在看着</title>
+      <link>https://blog.williamgates.net/2006/07/the-whole-world-is-looking-at-you/</link>
+      <pubDate>Mon, 10 Jul 2006 15:30:05 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/07/the-whole-world-is-looking-at-you/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/the-whole-world-is-looking-at-you-01.jpg&#34; alt=&#34;the-whole-world-is-looking-at-you&#34;  width=480 height=&#34;375&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/the-whole-world-is-looking-at-you-02.jpg&#34; alt=&#34;the-whole-world-is-looking-at-you&#34;  width=480 height=&#34;324&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/the-whole-world-is-looking-at-you-03.jpg&#34; alt=&#34;the-whole-world-is-looking-at-you&#34;  width=283 height=&#34;400&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/the-whole-world-is-looking-at-you-04.jpg&#34; alt=&#34;the-whole-world-is-looking-at-you&#34;  width=480 height=&#34;325&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　世界杯就这样结束了。四强都是我喜爱的球队，谁赢谁输其实并不是关键。但昨天的比赛过后，还是觉得，有些感伤，甚至在网上说了些发泄的话。但是，仔细想来，不管怎样，这就是历史的痕迹，已经确定的事实。&lt;/p&gt;
 &lt;p&gt;　　因为，全世界都在看着。&lt;/p&gt;
 &lt;!--description--&gt;
@@ -940,53 +998,26 @@
 　　结果并不重要，谁成为英雄谁成为罪人，谁拥有遗憾谁带走了荣光，都不重要，没有人不完美的谢幕，即使是黄油手，即使是齐秃头，即使是某个微不足道的小国某个微不足道的球员，哪怕是在小组赛就被淘汰，哪怕是上场就被罚下，这都是，铭记在整个人类心中的历史，这就够了。&lt;br&gt;
 　　因为，整个世界都在看着。&lt;/p&gt;
 &lt;p&gt;　　他们没有遗憾，每一个人，都是幸福的，都是胜利者。因为，整个世界，都在看着他们，他们的传奇，是人类的一段历史，必将代代相传。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>I&#39;&#39;S：一个关于奇迹的童话</title>
-    <link>https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/</link>
-    <pubDate>Sun, 02 Apr 2006 00:25:51 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/</guid>
-    <description>
-        &lt;p&gt;　　看完了I&#39;&#39;S的漫画，很后悔自己现在才看到这么优秀的作品，又有些庆幸，在看这部作品之前，看了草莓100%，否则对比看来，可能连看完草莓的兴致都没有了。&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-01.jpg&#34; 
-    alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
-     
-    width=385 
-    height=&#34;359&#34;  /&gt;&lt;/p&gt;
+      <title>I&#39;&#39;S：一个关于奇迹的童话</title>
+      <link>https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/</link>
+      <pubDate>Sun, 02 Apr 2006 00:25:51 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/04/i-s-the-miracle-the-fairy-tale/</guid>
+      <description>&lt;p&gt;　　看完了I&#39;&#39;S的漫画，很后悔自己现在才看到这么优秀的作品，又有些庆幸，在看这部作品之前，看了草莓100%，否则对比看来，可能连看完草莓的兴致都没有了。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-01.jpg&#34; alt=&#34;i-s-the-miracle-the-fairy-tale&#34;  width=385 height=&#34;359&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　这是一个关于奇迹的童话。&lt;/p&gt;
 &lt;p&gt;　　对一个好似遥不可及的人告白，在放弃的那一刹那，一句随口的话，换来的是一份红着脸的，幸福的回答。&lt;br&gt;
 　　自己的女朋友成了电视上的广告明星，成了“大家的”偶像，原本在学校里每天都能看到却不敢接近半步的爱人，在成为自己女朋友之后却没有半点音讯。&lt;br&gt;
 　　自己所爱的人在前途最光明的时候放弃了自己的理想，因为她明白她所爱的人，有着更伟大的理想——永远和她在一起。&lt;/p&gt;
 &lt;!--description--&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-02.jpg&#34; 
-    alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
-     
-    width=317 
-    height=&#34;235&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-03.jpg&#34; 
-    alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
-     
-    width=701 
-    height=&#34;533&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-04.jpg&#34; 
-    alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
-     
-    width=259 
-    height=&#34;391&#34;  /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-05.jpg&#34; 
-    alt=&#34;i-s-the-miracle-the-fairy-tale&#34; 
-     
-    width=538 
-    height=&#34;534&#34;  /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-02.jpg&#34; alt=&#34;i-s-the-miracle-the-fairy-tale&#34;  width=317 height=&#34;235&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-03.jpg&#34; alt=&#34;i-s-the-miracle-the-fairy-tale&#34;  width=701 height=&#34;533&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-04.jpg&#34; alt=&#34;i-s-the-miracle-the-fairy-tale&#34;  width=259 height=&#34;391&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/i-s-the-miracle-the-fairy-tale-05.jpg&#34; alt=&#34;i-s-the-miracle-the-fairy-tale&#34;  width=538 height=&#34;534&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　这一切，完全是奇迹。现实生活中遇上哪怕一件，都可以算是三生之幸。然而，漫画就是为了表达你所不能体验的，你所不敢想象的生活而存在的。通过几乎不可能实现的故事，通过这样一个又一个奇迹，它不是要给我们说教一个什么道理，而是要问我们一个问题，人最大的价值，在哪里？名利，地位，成就，抑或是幸福的生活？或者，是拥有一个理想，并且为着这个理想坚强地走下去吧。&lt;/p&gt;
 &lt;p&gt;　　理想无所谓大小之分，无所谓高低之别，伊织的理想，未必就比一贵的来得高贵，虽然到最后一刻，他才明白自己的理想是什么。他一直拼命努力的，一直在心底最深处坚持的，都是和所爱的人在一起的愿望。而为了所爱的人放弃理想，他们二人都尝试做了，然而，这到底是对是错呢？&lt;/p&gt;
 &lt;p&gt;　　我不知道。&lt;/p&gt;
@@ -999,23 +1030,16 @@
 　　只有相信奇迹的人，奇迹才会降临在他的头上。&lt;br&gt;
 　　我不是生活在童话中，我却相信奇迹，相信我能书写自己的童话。&lt;/p&gt;
 &lt;p&gt;　　我坚信。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>八月照相馆——绝望中的希望，是残酷还是温暖？</title>
-    <link>https://blog.williamgates.net/2006/01/photostudio-in-august/</link>
-    <pubDate>Mon, 16 Jan 2006 20:55:50 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/01/photostudio-in-august/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/photostudio-in-august.jpg&#34; 
-    alt=&#34;photostudio-in-august&#34; 
-     
-    width=399 
-    height=&#34;570&#34;  /&gt;&lt;/p&gt;
+      <title>八月照相馆——绝望中的希望，是残酷还是温暖？</title>
+      <link>https://blog.williamgates.net/2006/01/photostudio-in-august/</link>
+      <pubDate>Mon, 16 Jan 2006 20:55:50 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/01/photostudio-in-august/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/photostudio-in-august.jpg&#34; alt=&#34;photostudio-in-august&#34;  width=399 height=&#34;570&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　一部好电影，应该不是要传达一个什么特定的意义，而只是提出一个问题。&lt;br&gt;
 　　每个人看同一部电影，会看到不同的心情。&lt;br&gt;
 　　也许有人会为这部电影掉眼泪，也许有人会想如果自己失去了爱人会如何。&lt;br&gt;
@@ -1055,23 +1079,16 @@
 &lt;p&gt;　　我们都留下了一些什么，虽然未必是快乐，未必是幸福。&lt;br&gt;
 　　但每一段感情都会陪着我们，走过快乐悲伤，走过人生的每一个坎和每一次激动，给我们勇气，也让我们在月夜拎着酒瓶哭泣，就这样伴着我们，&lt;/p&gt;
 &lt;p&gt;　　直到生命的最后一刻。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
     <item>
-    <title>Narcissu：冰冻的时间再次开始了流动</title>
-    <link>https://blog.williamgates.net/2006/01/narcissu-time-goes-on/</link>
-    <pubDate>Wed, 11 Jan 2006 15:50:00 +0000</pubDate>
-    
-    <guid>https://blog.williamgates.net/2006/01/narcissu-time-goes-on/</guid>
-    <description>
-        &lt;p&gt;&lt;img loading=&#34;lazy&#34; 
-    src=&#34;/assets/img/narcissu-time-goes-on.jpg&#34; 
-    alt=&#34;narcissu-time-goes-on&#34; 
-     
-    width=500 
-    height=&#34;600&#34;  /&gt;&lt;/p&gt;
+      <title>Narcissu：冰冻的时间再次开始了流动</title>
+      <link>https://blog.williamgates.net/2006/01/narcissu-time-goes-on/</link>
+      <pubDate>Wed, 11 Jan 2006 15:50:00 +0000</pubDate>
+      
+      <guid>https://blog.williamgates.net/2006/01/narcissu-time-goes-on/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;/assets/img/narcissu-time-goes-on.jpg&#34; alt=&#34;narcissu-time-goes-on&#34;  width=500 height=&#34;600&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;　　我是不愿意把这个作品称为“游戏”的，更不想用“玩”这个字，只是实在找不到词语来解释了……其实，就像制作人员所说，它更接近于一部小说，虽然 Gal本来就跟小说差不多，但这部更加特别，如果按作者的希望不去听语音的话，这简直就完完全全是一部电子小说，连Gal最常见的选项都没有，一路到底，没有任何可以选择或停留的地方。&lt;/p&gt;
 &lt;p&gt;　　结束之后，没有太强烈的感觉，似乎不该笑，但又似乎不该哭，没有太明确的悲伤或喜悦。我该为女主角高兴？还是扼腕？好像，一切都应该在她走进海水的一瞬，被潮水轻松的带走，不留痕迹。&lt;/p&gt;
 &lt;!--description--&gt;
@@ -1097,8 +1114,7 @@
 &lt;p&gt;　　说不清给一个注定没有未来的人以希望，是美好还是残酷。&lt;br&gt;
 　　但至少她走入海水的时候，有人会留恋她，她，也会留恋这个世界&lt;/p&gt;
 &lt;p&gt;　　——这也许就是生活，就是命运吧。&lt;/p&gt;
-
-    </description>
+</description>
     </item>
     
   </channel>

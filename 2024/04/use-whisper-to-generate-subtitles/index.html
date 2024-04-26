@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="dark">
+    <title>使用whisper生成字幕的经验备忘 | WilliamGates&#39; Blog</title>
+
+    
+    
+
+    <meta property="og:site_name" content="WilliamGates&#39; Blog" />
+    <meta property="og:title" content="使用whisper生成字幕的经验备忘 | WilliamGates&#39; Blog" />
+    <meta itemprop="name" content="使用whisper生成字幕的经验备忘 | WilliamGates&#39; Blog" />
+    <meta name="twitter:title" content="使用whisper生成字幕的经验备忘 | WilliamGates&#39; Blog" />
+    <meta name="application-name" content="使用whisper生成字幕的经验备忘 | WilliamGates&#39; Blog" />
+
+
+    <meta name="description"
+        content="" />
+    <meta name="twitter:description"
+        content="" />
+    <meta itemprop="description"
+        content="" />
+    <meta property="og:description"
+        content="" />
+
+    
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/%20favicon.ico" />
+    
+    <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
+    
+</head>
+    <script>
+    (function() {
+        const colorSchemeKey = 'ThemeColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.userColorScheme = 'dark';
+        } else {
+            document.documentElement.dataset.userColorScheme = 'light';
+        }
+    })();
+</script>
+
+    <body class="dark">
+        <nav class="navbar">
+    <div class="container">
+        <div class="flex">
+            <div>
+                <a class="brand" href="/">
+                    
+                    
+                    WilliamGates&#39; Blog
+                    </a>
+            </div>
+            <div class="flex">
+                
+                <a href="/about/">About</a>
+                
+                <a href="/links/">Links</a>
+                
+                <a href="/posts/">Posts</a>
+                
+                <a href="/index.xml">RSS</a>
+                
+                <button id="dark-mode-button">
+                  <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                  <svg class="dark" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M16 2s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2V2zm18 14s2 0 2 2s-2 2-2 2h-2s-2 0-2-2s2-2 2-2h2zM4 16s2 0 2 2s-2 2-2 2H2s-2 0-2-2s2-2 2-2h2zm5.121-8.707s1.414 1.414 0 2.828s-2.828 0-2.828 0L4.878 8.708s-1.414-1.414 0-2.829c1.415-1.414 2.829 0 2.829 0l1.414 1.414zm21 21s1.414 1.414 0 2.828s-2.828 0-2.828 0l-1.414-1.414s-1.414-1.414 0-2.828s2.828 0 2.828 0l1.414 1.414zm-.413-18.172s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zm-21 21s-1.414 1.414-2.828 0s0-2.828 0-2.828l1.414-1.414s1.414-1.414 2.828 0s0 2.828 0 2.828l-1.414 1.414zM16 32s0-2 2-2s2 2 2 2v2s0 2-2 2s-2-2-2-2v-2z"/><circle fill="#FFD983" cx="18" cy="18" r="10"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
+                </button>
+            </div>
+            </div>
+    </div>
+</nav>
+        <main>
+            
+<div class="container">
+    <article>
+        <header class="article-header">
+            <div class="thumb">
+                <div>
+                    <h1>使用whisper生成字幕的经验备忘</h1>
+                    <div class="post-meta">
+                        <div>
+                            
+                            
+                              
+                            
+                            By William Gates | <time>April 26, 2024</time>
+                            | 13 minutes
+                        </div>
+                        <div class="tags">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
+
+    <div class="article-post">
+    <p>　　<a href="https://huggingface.co/openai/whisper-large-v3">whisper</a>是openai发布的模型，主要用于语音转写。我最近尝试了用它来听写并生成字幕，主要的需求显然是文字准确，不漏记也不多记（多记显然更不能接受，下文会提到幻觉问题）；次要的需求是：每行字幕不应该太长，字幕时间戳应该尽量准确。本文是截至2024年4月的一些知识和经验备忘，是一篇“综述”，不是一篇详尽的教程。本文中对参数的解释大多基于作者给出的解释或本人对相关工具代码的阅读和理解，但对参数调整的意见就纯粹基于个人的感觉了，不一定有科学依据。</p>
+<h2 id="相关术语">
+    <a href="#%e7%9b%b8%e5%85%b3%e6%9c%af%e8%af%ad" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    相关术语
+</h2>
+<ul>
+<li><code>ASR</code>, Automatic Speech Recognition, also known as Speech To Text (STT), refers to the problem of automatically transcribing spoken language, 这解释来自<a href="https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/asr/intro.html">Nvidia</a>。我们在使用whisper的过程中，主要使用的就是ASR功能。在具体的工具中，该部分任务或功能一般被称为<code>transcribe</code>。</li>
+<li><code>VAD</code>, Voice Activity Detection, 检测语音（或者说反过来，检测非语音），标出语音部分供模型进行下一步推理。个人认为第三方工具针对whisper的增强主要体现在推理速度和VAD两方面，我们几乎所有的参数调整也集中针对于VAD。</li>
+<li><code>Hallucination</code>, the experience of seeing, hearing, feeling, or smelling something that does not exist, 用过chatGPT的你应该很熟悉了，幻觉就是模型在一本正经地胡说八道。在ASR用途的模型中，幻觉主要体现为转写了根本不存在的语句，而不是字词意义上的识别错误。正因为这样，幻觉在生成字幕的任务中危害非常大，因为字词错误观众可以推测、可以忽略，完全不存在的台词则严重影响对内容的理解。whisper最常出现的典型幻觉是，它会在字幕的结尾加上“谢谢观看”或者类似意思的语句。</li>
+<li><code>Beam search</code>, a heuristic search algorithm that explores a graph by expanding the most promising node in a limited set, 这解释来自<a href="https://en.wikipedia.org/wiki/Beam_search">维基百科</a>。在whisper的使用中，有两种设置路径：一种是使用whisper的<code>beam_size</code>和<code>patience</code>等参数来进行beam search，另一种是使用<code>temperature</code> <code>best_of</code> <code>compression_ratio_threshold</code>和<code>log_prob_threshold</code>等参数来进行取样。</li>
+<li><code>diarization</code>, Speaker diarization is the process of segmenting audio recordings by speaker labels and aims to answer the question “who spoke when?”, 还是来自<a href="https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/asr/speaker_diarization/intro.html">Nvidia</a>的解释。whisper模型没有这个功能，各种工具都承认他们自己的实现不能算完美。理论上这能实现更准确的字幕断句，但本身并不是生成字幕的强需求，我没有深入研究。</li>
+<li><code>WER</code>, word error rates, ASR模型的能力相对比较容易考核，这就是最常用的指标，另一个常用的指标是<code>CER</code>即character error rates）。</li>
+</ul>
+<h2 id="模型">
+    <a href="#%e6%a8%a1%e5%9e%8b" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    模型
+</h2>
+<p>　　openai官方提供了各种大小的模型，就我们非实时生成字幕的用途来说，只有large模型有意义（最新的是large-v3）。</p>
+<p>　　huggingface上有很多在whisper基础上调优的模型，我尝试下来日语的<a href="https://huggingface.co/clu-ling/whisper-large-v2-japanese-5k-steps">clu-ling/whisper-large-v2-japanese-5k-steps</a>还不错，但记得基于CTranslate2的推理工具需要转换后的CT2模型，<a href="https://huggingface.co/zh-plus/faster-whisper-large-v2-japanese-5k-steps">有人帮你做好了</a>。这个模型的缺陷是在某些情况下转写内容可能缺少标点符号，本文的速度测试中的样本在某些推理工具中就会这样，暂时不知道原因。另一个日语模型<a href="https://huggingface.co/vumichien/whisper-large-v2-mix-jp">vumichien/whisper-large-v2-mix-jp</a>就会有标点。</p>
+<p>　　作为字幕，我们希望转写文本既准确又简短，要注意不同的模型在推理工具相同的参数下转写的长度不同，这里不是指遣词造句的风格不同导致句子长度不同，而是换行（换一条新字幕）的频率不同。虽然这一点和下文提到的VAD关系最大，但根据我的经验，模型也会有影响。</p>
+<h2 id="推理工具">
+    <a href="#%e6%8e%a8%e7%90%86%e5%b7%a5%e5%85%b7" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    推理工具
+</h2>
+<p>　　以下工具全都可以顺利在WSL2中运行，记得如果你需要在WSL2中安装cuda-tools或cudnn之类的玩意，请遵守<a href="https://docs.nvidia.com/cuda/wsl-user-guide/index.html">Nvidia的指导</a>，简单来说就是不要安装linux驱动（WSL2里面的显卡驱动是windows驱动提供的），安装那些不含驱动的包就好，建议用conda来做这些工作。</p>
+<h3 id="官方工具-openaiwhisper">
+    <a href="#%e5%ae%98%e6%96%b9%e5%b7%a5%e5%85%b7-openaiwhisper" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    官方工具 openai/whisper
+</h3>
+<p>　　<a href="https://github.com/openai/whisper">openai/whisper</a>是openai官方提供的工具，按照官方的介绍以及<code>no_speech_threshold</code>这个参数，这个工具会使用whisper自己的VAD功能，个人觉得跟下文中的第三方工具使用的VAD方法而言，只能说聊胜于无（第三方工具几乎全都引入了自己的VAD，说明他们也是这么想的）。这个工具不能调用非官方的whisper模型，推理速度也没有任何优势。</p>
+<h3 id="主流后端-systranfaster-whisper-及其命令行套壳-softcatalawhisper-ctranslate2">
+    <a href="#%e4%b8%bb%e6%b5%81%e5%90%8e%e7%ab%af-systranfaster-whisper-%e5%8f%8a%e5%85%b6%e5%91%bd%e4%bb%a4%e8%a1%8c%e5%a5%97%e5%a3%b3-softcatalawhisper-ctranslate2" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    主流后端 SYSTRAN/faster-whisper 及其命令行套壳 Softcatala/whisper-ctranslate2
+</h3>
+<p>　　<a href="https://github.com/SYSTRAN/faster-whisper">SYSTRAN/faster-whisper</a>是很主流的whisper推理工具，它不仅不提供图形界面，而且也不提供命令行接口，只能作为一个Python库被调用，幸好有人做了一个命令行套壳<a href="https://github.com/Softcatala/whisper-ctranslate2">Softcatala/whisper-ctranslate2</a>，节省很多工作量。faster-whisper的重要优势在于：</p>
+<ul>
+<li>使用了第三方VAD方案<a href="https://github.com/snakers4/silero-vad">silero-vad</a>,效果明显、可调参数多（部分不是silero-vad的参数，而是faster-whisper给VAD功能添加的参数，下文会提到，很有用处）。通过VAD将音频提前切断，只将语音部分提供给whisper做转写，大幅度降低了whisper的幻觉，（在某些情况下大幅度）提高了转写的速度。</li>
+<li>可以加载非官方whisper模型，有些基于whisper调优的模型对特定语言的转写能力提升很大。</li>
+<li>使用<a href="https://github.com/OpenNMT/CTranslate2/">CTranslate2</a>进行推理,推理速度明显快（数倍）于官方工具。但是需要使用兼容CTranslate2的模型，hugging face上标为ct2的模型就是这类，其他模型也可以通过脚本转换为ct2模型。</li>
+</ul>
+<p>　　我个人主要使用的就是Softcatala/whisper-ctranslate2，需要注意的参数主要包括（未特别说明独有的参数，在官方工具中也有）：</p>
+<ul>
+<li><code>length_penalty</code>, 这是whisper模型提供的参数，并不硬性对单行字幕长度产生影响，只会在推理时更倾向于选择产生较短的句子，影响转写质量，不建议修改。</li>
+<li><code>no_speech_threshold</code>, whisper自己的VAD设置，值越低，越偏向于认定一段声音为沉默（即不是语音）。</li>
+<li><code>word_timestamps</code>, 是否提供基于词的时间戳，这个选项实际上不会导致输出的字幕文件是每行一个词的，只是在推理过程中对词标出了时间戳，生成字幕文件的时候还是会合并成每行一句话，这有利于控制单行字幕长度，也可以用于在字幕中标出当前发音的词。但是whisper提供的时间戳实际上是不准的，下文会提到。</li>
+<li><code>repetition_penalty</code>, 软性要求whisper在推理时降低重复，个人感觉不是很好用，设置为1.2以上的时候有效果，但会影响转写内容（即使不存在重复，语句内容也会随着这个参数而发生变化）。这是ctranslate2的功能，不是whisper模型实现的，当然在官方工具中也就没有这个参数。</li>
+<li><code>no_repeat_ngram_size</code>, 在一行结果中没有重复的如此规模的“语丝”，按理说在设为2的时候应该不会出现任何重复的字/词，但实际上效果并不理想，个人觉得不是很好用，且会影响转写内容，建议自己尝试效果。这是ctranslate2的功能，不是whisper模型实现的，官方工具不包含这个参数。</li>
+<li><code>max_words_per_line</code>, 基于上述对每个词打时间戳的功能，可以限制每行字幕的长度，这不是whisper提供的功能，是推理工具在写入字幕文件时进行的处理。但是whisper-ctranslate2和官方工具一样，实现的方法非常粗暴，就是严格按照词数截断字幕，不能按照标点或空格合理截断。<a href="https://github.com/Softcatala/whisper-ctranslate2/pull/78">有个PR</a>试图在一定程度上解决这个问题，但还没有被合并。</li>
+<li><code>vad_threshold</code>, 这是faster-whisper自带的silero-vad的参数，官方工具没有。这个值越高，越偏向于认定一段声音为沉默（与<code>no_speech_threshold</code>的方向相反）。对于字正腔圆的样本（例如新闻或动漫），建议设为默认的0.5；对于偏向生活化、口语化的样本，建议设为0.4乃至0.35（更低也可以尝试）。由于这个VAD工作于whisper推理之前，所以这个值越高，判断出的沉默越多、语音越少，whisper的工作内容越少、推理速度越快。</li>
+<li><code>vad_min_speech_duration_ms</code>, 硬性抛弃短于多少时间的片段，即使VAD认为它是语音。这不是whisper实现的功能，是推理工具检查VAD结果时进行的处理。如果样本中有大量短促无意义的语音或类似于语音的声音，不想让它们毫无意义地出现在字幕中，这个功能非常有用。faster-whisper和whisper-ctranslate2暴露了这个参数，其他工具大多没有这个参数（没有进行这样的处理，或者硬编码了一个作者喜欢的值）。</li>
+<li><code>vad_max_speech_duration_s</code>, 规定交给whipser的一段语音的最大长度，有助于减少字幕中出现过长的句子。考虑到上述<code>max_words_per_line</code>参数非常粗暴从而用途有限，这个参数挺有用的。我尝试使用faster-whisper的<code>chunk_length</code>参数（硬性决定交给whisper的分段长度），但结果是导致了转写结果完全不正确；我尝试将faster-whisper的<code>vad_speech_pad_ms</code>参数设置成0，也没有取得类似于whisperX的效果（完全没有效果）。因此基于vad的这个参数是非常有必要的。这也是官方工具没有的参数。</li>
+<li><code>vad_min_silence_duration_ms</code>, 硬性规定短于多少时间的沉默不会被切除，即使VAD认为它是沉默。这同样不是whisper的功能，是推理工具进行的处理，对于长句过多的结果，将这个值设为0有奇效（只要喘气就算一段新的语音，降低输入whisper模型的segment长度）。官方工具显然不会有这个参数。</li>
+</ul>
+<h3 id="超快工具-m-bainwhisperx">
+    <a href="#%e8%b6%85%e5%bf%ab%e5%b7%a5%e5%85%b7-m-bainwhisperx" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    超快工具 m-bain/whisperX
+</h3>
+<p>　　<a href="https://github.com/m-bain/whisperX">m-bain/whisperX</a>这个工具标榜自己的快，虽然其使用faster-whisper作为后端，但它并不是纯粹的faster-whisper套壳。它用有点奇怪的方法实现了单个音频样本的分片批量处理（让faster-whisper社区<a href="https://github.com/SYSTRAN/faster-whisper/issues/59">感到困惑</a>）；由于批量处理，不能在转写过程中显示结果，只能以百分比方式显示进度；由于批量处理，它不适合打开<code>condition_on_prev_text</code>参数，因此可能降低转写内容的稳定性。它虽然使用了faster-whisper，但不使用faster-whisper的VAD功能，而是使用了作者提供的VAD模型（实际上可能是<a href="https://huggingface.co/pyannote/segmentation">pyannote/segmentation</a>），这个模型比faster-whisper的VAD模型大差不多10倍，可能效果也更好（实测是的）。它在whisper之外，引入facebook的<a href="https://huggingface.co/facebook/wav2vec2-large-960h-lv60-self">wav2vec</a>用来辅助生成精确的时间戳，但这功能只能在部分主流语言上实现（因为需要对应语言的wav2vec模型，第三方调优的也可以），而且对数字的处理不佳。因为它它暴露的VAD参数很少，特别是推理工具实现而非模型实现的那些参数（例如faster-whisper的<code>vad_min_speech_duration_ms</code>）；即使是暴露的那些参数，也并不是在VAD流程的每个阶段都使用用户指定的值，有些阶段是硬编码的。总而言之，这个项目的速度确实是优势（虽然在我们的测试中不明显，更长的、VAD不容易处理好的样本会明显得多，特别是保持<code>chunk_size</code>为默认值而不在乎出现长句的情况下，速度数倍于faster-whisper是很正常的），但其代码质量不太好评价。</p>
+<p>　　我使用该工具较少，可以介绍的参数主要包括：</p>
+<ul>
+<li><code>vad_onset</code>, 基本等于faster-whisper的<code>vad_threshold</code>，但两者VAD模型不同，数值需要自己摸索。</li>
+<li><code>vad_offset</code>, 猜测等于faster-whisper中的<code>neg_threshold</code>（代码中的变量，没有暴露为命令行参数），faster-whisper硬编码为<code>vad_threshold</code>减去0.15，whisperX的默认值是<code>vad_onset</code>减去0.137。</li>
+<li><code>chunk_size</code>, 这个参数不是提供给faster-whisper的<code>chunk_length</code>, 而是提供给VAD的，类似于whisper-ctranslate2的<code>vad_max_speech_duration_s</code>, 但降低长句的效果比whisper-ctranslate2好得多，可能得益于更好的VAD模型或更好的处理方式（winsperX的作者的<a href="https://arxiv.org/abs/2303.00747">论文</a>中有关于这个<code>VAD Cut &amp; Merge</code>的描述)</li>
+</ul>
+<h3 id="精确时间轴-linto-aiwhisper-timestamped">
+    <a href="#%e7%b2%be%e7%a1%ae%e6%97%b6%e9%97%b4%e8%bd%b4-linto-aiwhisper-timestamped" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    精确时间轴 linto-ai/whisper-timestamped
+</h3>
+<p>　　<a href="https://github.com/linto-ai/whisper-timestamped">linto-ai/whisper-timestamped</a>介绍了whisper为什么不能提供准确的时间戳，也介绍了其他提供准确时间戳方案的局限性（主要是whisperX使用wav2vec的方案），强调自己能够在不借助辅助模型的情况下实现精准时间戳，我觉得这个项目的README价值比工具更大。它提供三种不同的VAD方案供选择，但没有暴露任何VAD参数。它可以使用第三方模型，但不要被他的说明骗了，使用第三方模型不需要加<code>--backend transformers</code>参数（加了跑不起来）。我没有测试过其时间戳是否真的比别的工具精准，你可以自己试试看。它不是一个基于faster-whisper的工具，意味着它的速度不会是优势。</p>
+<h3 id="ggerganovwhispercpp">
+    <a href="#ggerganovwhispercpp" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    ggerganov/whisper.cpp
+</h3>
+<p>　　<a href="https://github.com/ggerganov/whisper.cpp">whisper.cpp</a>是另一个主流工具（31.1K star），设计之初致力于在CPU上高效推理，没看出其在GPU上有特殊优势，而且没有附加的VAD功能，因此我没有实际用过，你可以试试看。</p>
+<h3 id="速度测试">
+    <a href="#%e9%80%9f%e5%ba%a6%e6%b5%8b%e8%af%95" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    速度测试
+</h3>
+<p>　　使用的样本是<code>[SFEO-Raws] Koimonogatari - 01 (BD 720P x264 10bit AACx2)[9369B674].mp4</code>即恋物语第一集的音频，长度为26m34s，转换为16000hz的wav（这对于VAD很重要，因为VAD模型大多是基于8K和16Khz训练的）。所有的运行时间都是time命令的real项。</p>
+<pre><code>以下各行的命令分别为：
+</code></pre>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">whisperx --model whisper-large-v2-japanese --device cuda --output_format srt --language ja --vad_onset 0.5 --vad_offset 0.35 --no_speech_threshold 0.3 --print_progress True output.wav
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">whisperx --model whisper-large-v2-japanese --device cuda --output_format srt --language ja --vad_onset 0.5 --vad_offset 0.35 --chunk_size <span class="m">10</span> --no_speech_threshold 0.3 --print_progress True output.wav
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">whisper-ctranslate2 --device cuda --compute_type float16 --model_directory ./whisper-large-v2-japanese --language ja --local_files_only <span class="nb">true</span> --output_format srt --word_timestamps <span class="nb">true</span> --hallucination_silence_threshold <span class="m">5</span> --beam_size <span class="m">5</span> --vad_filter <span class="nb">true</span> --vad_threshold 0.5 --vad_min_silence_duration_ms <span class="m">0</span> --vad_min_speech_duration_ms <span class="m">100</span> --vad_max_speech_duration_s <span class="m">10</span> --no_speech_threshold 0.3 output.wav
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">whisper-ctranslate2 --device cuda --compute_type float16 --model_directory ./whisper-large-v2-japanese --language ja --local_files_only <span class="nb">true</span> --output_format srt --word_timestamps <span class="nb">true</span> --hallucination_silence_threshold <span class="m">5</span> --beam_size <span class="m">5</span> --vad_filter <span class="nb">true</span> --vad_threshold 0.5 --vad_min_silence_duration_ms <span class="m">0</span> --vad_max_speech_duration_s <span class="m">10</span> --no_speech_threshold 0.3 output.wav
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">whisper_timestamped --model clu-ling/whisper-large-v2-japanese-5k-steps --device cuda --output_dir . --output_format srt --language ja --vad True --no_speech_threshold 0.3 --verbose True --accurate
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">whisper_timestamped --model clu-ling/whisper-large-v2-japanese-5k-steps --device cuda --output_dir . --output_format srt --language ja --vad silero:3.1 --no_speech_threshold 0.3 --verbose True --accurate output.wav
+</span></span></code></pre></div><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>工具</th>
+<th>时间</th>
+<th>字幕条数</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>whisperX</td>
+<td>1m21.291s</td>
+<td>57</td>
+<td>全是长句，但速度确实快</td>
+</tr>
+<tr>
+<td>1</td>
+<td>whisperX</td>
+<td>1m32.823s</td>
+<td>176</td>
+<td>句子普遍较短，可能得益于更好的VAD模型，但有些句子反而非常长</td>
+</tr>
+<tr>
+<td>2</td>
+<td>whisper-ctranslate2</td>
+<td>3m6.634s</td>
+<td>241</td>
+<td>句子长短与上一栏相比各有千秋，效果均不完美</td>
+</tr>
+<tr>
+<td>3</td>
+<td>whisper-ctranslate2</td>
+<td>3m7.070s</td>
+<td>184</td>
+<td>可能是物语系列讲话太疯狂的原因，去掉<code>vad_min_speech_duration_ms</code>会加强转写准确性，但长句更多了……</td>
+</tr>
+<tr>
+<td>4</td>
+<td>whisper_timestamped</td>
+<td>14m59.857s</td>
+<td>207</td>
+<td>看到这感人的时间了吧，另外结果中的长句和准确性都不太理想，可能是我没有充分调试</td>
+</tr>
+<tr>
+<td>5</td>
+<td>whisper_timestamped</td>
+<td>12m35.261s</td>
+<td>208</td>
+<td>换了vad速度快一点，句子长度也好一点</td>
+</tr>
+</tbody>
+</table>
+<h2 id="字幕翻译及其他后处理">
+    <a href="#%e5%ad%97%e5%b9%95%e7%bf%bb%e8%af%91%e5%8f%8a%e5%85%b6%e4%bb%96%e5%90%8e%e5%a4%84%e7%90%86" class="anchor">
+        <svg class="icon" aria-hidden="true" focusable="false" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+            <path fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+        </svg>
+    </a>
+    字幕翻译及其他后处理
+</h2>
+<p>　　对于减少字幕中长句的需求，目前看来最好的方法不是在上面提到的工具中折腾chunk的长度，而是直接用非常短的字词长度硬性截断字幕（使用<code>max_words_per_line</code>之类的参数），再通过对字幕文件进行后处理，将字幕按照标点、空格等分隔符拼接起来。根据whisper的工作原理，这个行为不能反过来——后处理的时候不知道每个字词的时间戳，因此不能生成长句再拆分。但这条路还没有走通，虽然有人做了<a href="https://github.com/zj1123581321/Adjust_SubTitle">类似思路的小工具</a>，但他的设计目的是合并过短的字幕，通过初步阅读代码，我觉得简单修改这个工具也达不成我们的目的。</p>
+<p>　　对于字幕的翻译，一股脑发给AI的效果会很差，AI还会评价剧情甚至因为（它认为的）色情暴力之类而拒绝翻译。因此一股脑丢给google翻译/deepl之类的翻译引擎可能是比较简单的选择，而一句句发给AI可能是效果较好的方案。我还没有找到最合适的工具。</p>
+<p>　　可能会尝试自己写一个工具来做以上这两件事，就不在本文中介绍了。</p>
+
+    </div>
+</div>
+
+<div class="container">
+    
+    <nav class="flex container suggested">
+        
+        <a rel="prev" href="/2014/05/fight_for_happiness/" title="Previous post (older)">
+            <span>Previous</span>
+            请你勇敢地伸出手
+            </a>
+        
+        
+        
+    </nav>
+    
+</div>
+ 
+<div class="container">
+    
+</div>
+
+</main>
+
+
+        </main>
+        <footer class="footer flex">
+    <section class="container">
+        <nav class="footer-links">
+            
+        </nav>
+
+        
+    </section>
+    <script defer src="/ts/features.f658accd96ff946aea04e7fca44a794f9632d32718aaf69be3f0f434b3ac6118.js" 
+    data-enable-footnotes="true"
+    ></script>
+</footer>
+
+    </body>
+</html>

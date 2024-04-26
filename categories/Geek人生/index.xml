@@ -4,44 +4,44 @@
     <title>Geek人生 on WilliamGates&#39; Blog</title>
     <link>https://blog.williamgates.net/categories/Geek%E4%BA%BA%E7%94%9F/</link>
     <description>Recent content in Geek人生 on WilliamGates&#39; Blog</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo 0.125.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Apr 2013 11:05:15 +0000</lastBuildDate><atom:link href="https://blog.williamgates.net/categories/Geek%E4%BA%BA%E7%94%9F/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Apr 2024 21:56:00 +0800</lastBuildDate>
+    <atom:link href="https://blog.williamgates.net/categories/Geek%E4%BA%BA%E7%94%9F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用whisper生成字幕的经验备忘</title>
+      <link>https://blog.williamgates.net/2024/04/use-whisper-to-generate-subtitles/</link>
+      <pubDate>Fri, 26 Apr 2024 21:56:00 +0800</pubDate>
+      <guid>https://blog.williamgates.net/2024/04/use-whisper-to-generate-subtitles/</guid>
+      <description>whisper是openai发布的模型，主要用于语音转写。我最近尝试了用它来听写并生成字幕，主要的需求显然是文字准确，不漏记也不多记（多记显</description>
+    </item>
     <item>
       <title>不再依赖Google Reader的Kindle Reader</title>
       <link>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</link>
       <pubDate>Tue, 16 Apr 2013 11:05:15 +0000</pubDate>
-      
       <guid>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</guid>
       <description>Kindle Reader是一个自动将Google Reader内容生成mobi文件并通过邮件发送至kindle的工具，由jieban开发。由于Googl</description>
     </item>
-    
     <item>
       <title>（旧版）对gaeproxy的一些研究，兼谈Geek的社会责任</title>
       <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</link>
       <pubDate>Sun, 24 Feb 2013 23:03:50 +0000</pubDate>
-      
       <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis-deprecated/</guid>
       <description>该文中描述的原理仍然有效，而gaeproxy的作者已经在项目主页、官方twitter帐号上明确说明了存在这种情况，故“作者未对公众说明”已经</description>
     </item>
-    
     <item>
       <title>（新版）对gaeproxy的“https代理”功能之分析和说明</title>
       <link>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</link>
       <pubDate>Sat, 23 Feb 2013 16:39:50 +0000</pubDate>
-      
       <guid>https://blog.williamgates.net/2013/02/gaeproxy-analysis/</guid>
       <description>经过我旧版文章分析后，gaeproxy的作者Max Lv很诚恳和大度地在项目主页和官方twitter帐号上解释了“https代理”功能，并将本</description>
     </item>
-    
     <item>
       <title>自制inf文件覆盖EDID数据以解决显示器分辨率和刷新率问题</title>
       <link>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</link>
       <pubDate>Tue, 17 Apr 2012 00:33:21 +0000</pubDate>
-      
       <guid>https://blog.williamgates.net/2012/04/edit-edid-to-force-resolutions-and-refresh-rates/</guid>
       <description>当windows系统（本文以win7为例）通过数字方式（HDMI或DVI）连接显示器/电视机时，会通过显卡驱动读取EDID数据，该数据会告知</description>
     </item>
-    
   </channel>
 </rss>

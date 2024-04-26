@@ -2,6 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://blog.williamgates.net/categories/</loc>
+    <lastmod>2024-04-26T21:56:00+08:00</lastmod>
+  </url><url>
+    <loc>https://blog.williamgates.net/categories/Geek%E4%BA%BA%E7%94%9F/</loc>
+    <lastmod>2024-04-26T21:56:00+08:00</lastmod>
+  </url><url>
+    <loc>https://blog.williamgates.net/</loc>
+    <lastmod>2024-04-26T21:56:00+08:00</lastmod>
+  </url><url>
+    <loc>https://blog.williamgates.net/2024/04/use-whisper-to-generate-subtitles/</loc>
+    <lastmod>2024-04-26T21:56:00+08:00</lastmod>
+  </url><url>
     <loc>https://blog.williamgates.net/about/</loc>
     <lastmod>2021-10-15T05:50:00+00:00</lastmod>
   </url><url>
@@ -14,20 +26,11 @@
     <loc>https://blog.williamgates.net/posts/</loc>
     <lastmod>2021-10-15T05:50:00+00:00</lastmod>
   </url><url>
-    <loc>https://blog.williamgates.net/</loc>
-    <lastmod>2021-10-15T05:50:00+00:00</lastmod>
-  </url><url>
-    <loc>https://blog.williamgates.net/categories/</loc>
-    <lastmod>2014-05-19T21:55:50+00:00</lastmod>
-  </url><url>
     <loc>https://blog.williamgates.net/categories/%E8%89%BA%E6%9C%AF%E9%9A%8F%E6%84%9F/</loc>
     <lastmod>2014-05-19T21:55:50+00:00</lastmod>
   </url><url>
     <loc>https://blog.williamgates.net/2014/05/fight_for_happiness/</loc>
     <lastmod>2014-05-19T21:55:50+00:00</lastmod>
-  </url><url>
-    <loc>https://blog.williamgates.net/categories/Geek%E4%BA%BA%E7%94%9F/</loc>
-    <lastmod>2013-04-16T11:05:15+00:00</lastmod>
   </url><url>
     <loc>https://blog.williamgates.net/2013/04/kindle-reader-without-google-reader/</loc>
     <lastmod>2013-04-16T11:05:15+00:00</lastmod>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
-    
-<head>
+    <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -10,23 +9,27 @@
 
     
     
-    
+
     <meta property="og:site_name" content="WilliamGates&#39; Blog" />
-    <meta property="og:title" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog"/>
+    <meta property="og:title" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
     <meta itemprop="name" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
     <meta name="twitter:title" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
     <meta name="application-name" content="不再依赖Google Reader的Kindle Reader | WilliamGates&#39; Blog" />
 
 
-    <meta name="description" content="" />
-    <meta name="twitter:description" content=""/>
-    <meta itemprop="description" content=""/>
-    <meta property="og:description" content="" />
+    <meta name="description"
+        content="" />
+    <meta name="twitter:description"
+        content="" />
+    <meta itemprop="description"
+        content="" />
+    <meta property="og:description"
+        content="" />
 
     
 
 
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="/%20favicon.ico" />
     
     <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
     
@@ -65,6 +68,8 @@
                 <a href="/links/">Links</a>
                 
                 <a href="/posts/">Posts</a>
+                
+                <a href="/index.xml">RSS</a>
                 
                 <button id="dark-mode-button">
                   <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
@@ -160,37 +165,26 @@
     Windows用户使用方法（很简单）
 </h2>
 <ol>
-<li>
-<p>下载最新版本的<a href="https://github.com/williamgateszhao/kindlereader/archive/v0.6.5.zip">v0.6.5</a></p>
-</li>
-<li>
-<p>解压缩后，只需保留<code>kindlereader.exe</code>和<code>config.sample.ini</code>两个文件，放在任意目录，其他文件都不需要</p>
-</li>
-<li>
-<p>如果你使用的系统是WindowsXP，那么你需要安装<a href="http://www.microsoft.com/en-us/download/details.aspx?id=29">Microsoft Visual C++ 2008 Redistributable Package</a></p>
-</li>
-<li>
-<p>将<code>config.sample.ini</code>改名为<code>config.ini</code>，并修改其中的内容，具体可以看文件中的注释，主要要改的选项是：</p>
-<pre><code> kindle_format，默认为book，如果你想要类似于狗耳朵那样的杂志形式，请改为periodical（只对官方系统有效）
- max_items_number，每个RSS源最多读取多少篇文章，建议不要太多
- max_image_per_article，每篇文章最多下载多少图片，由于上述的技术更新，本程序生成的文件不再动辄十几M，所以这里多一些也没问题
- max_old_date，不读取早于N天前的文章，一般与你多少天运行一次本程序相等，以免看到重复的文章
- mail_enable，如果需要程序自动将生成的mobi文件发送到kindle，需要将此项设为1
- to,一般是@free.kindle.com或@iduokan.com的邮箱，根据你使用系统的不同来决定
- username，你的邮箱（发信用，不是收信的iduokan或kindle邮箱）用户名，如果不使用gmail发信，请相应修改host、port、ssl等选项来符合你的smtp服务器（如QQ邮箱是host=smtp.qq.com,port=25,ssl=0）
- password，你的邮箱密码，如果不愿意将主要邮箱的密码明文写在配置文件中，可以单独注册一个邮箱专门用于发送
- feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，就写成feed1=www.guokr.com/rss/，每个feed结尾的数字不能重复，即必须是feed1、feed2、feed3这样编写下去，总量不限。如果你需要打开某个feed的强制全文输出（即原来该feed的文章只有摘要），你可以在http前面加上full，即fullhttp://www.a.com/rss/这样的。
-</code></pre>
-</li>
-<li>
-<p>下载亚马逊官方的mobi生成工具<a href="http://s3.amazonaws.com/kindlegen/kindlegen_win32_v2_8.zip">kindlegen</a>，解压后只需要<code>kindlegen.exe</code>一个文件，跟<code>kindlereader.exe</code>和<code>config.ini</code>放在同一个目录下</p>
-</li>
-<li>
-<p>运行<code>kindlereader.exe</code>之后，.mobi文件就会自动发送到你设置的邮箱，并被kindle所读取。如果你设置了不发送邮件，可以从当前目录下生成的data目录中找到两个.mobi文件，将较小的那个拷贝到kindle上也可以正常阅读。可以通过计划任务来让程序定期运行</p>
-</li>
-<li>
-<p>如果你的<code>kindlereader.exe</code>一闪而过，说明出错了，请到windows命令行下运行它来查看出错信息</p>
-</li>
+<li>下载最新版本的<a href="https://github.com/williamgateszhao/kindlereader/archive/v0.6.5.zip">v0.6.5</a></li>
+<li>解压缩后，只需保留<code>kindlereader.exe</code>和<code>config.sample.ini</code>两个文件，放在任意目录，其他文件都不需要</li>
+<li>如果你使用的系统是WindowsXP，那么你需要安装<a href="http://www.microsoft.com/en-us/download/details.aspx?id=29">Microsoft Visual C++ 2008 Redistributable Package</a></li>
+<li>将<code>config.sample.ini</code>改名为<code>config.ini</code>，并修改其中的内容，具体可以看文件中的注释，主要要改的选项是：</li>
+</ol>
+<ul>
+<li>kindle_format，默认为book，如果你想要类似于狗耳朵那样的杂志形式，请改为periodical（只对官方系统有效）</li>
+<li>max_items_number，每个RSS源最多读取多少篇文章，建议不要太多</li>
+<li>max_image_per_article，每篇文章最多下载多少图片，由于上述的技术更新，本程序生成的文件不再动辄十几M，所以这里多一些也没问题</li>
+<li>max_old_date，不读取早于N天前的文章，一般与你多少天运行一次本程序相等，以免看到重复的文章</li>
+<li>mail_enable，如果需要程序自动将生成的mobi文件发送到kindle，需要将此项设为1</li>
+<li>to,一般是@free.kindle.com或@iduokan.com的邮箱，根据你使用系统的不同来决定</li>
+<li>username，你的邮箱（发信用，不是收信的iduokan或kindle邮箱）用户名，如果不使用gmail发信，请相应修改host、port、ssl等选项来符合你的smtp服务器（如QQ邮箱是host=smtp.qq.com,- port=25,ssl=0）</li>
+<li>password，你的邮箱密码，如果不愿意将主要邮箱的密码明文写在配置文件中，可以单独注册一个邮箱专门用于发送</li>
+<li>feed1，feed2等都是你需要读取的RSS源地址，比如订阅果壳网，就写成feed1=www.guokr.com/rss/，每个feed结尾的数字不能重复，即必须是feed1、feed2、feed3这样编写下去，总量不限。如果你需要打开某个feed的强制全文输出（即原来该feed的文章只有摘要），你可以在http前面加上full，即fullhttp://www.a.com/rss/这样的。</li>
+</ul>
+<ol start="5">
+<li>下载亚马逊官方的mobi生成工具<a href="http://s3.amazonaws.com/kindlegen/kindlegen_win32_v2_8.zip">kindlegen</a>，解压后只需要<code>kindlegen.exe</code>一个文件，跟<code>kindlereader.exe</code>和<code>config.ini</code>放在同一个目录下</li>
+<li>运行<code>kindlereader.exe</code>之后，.mobi文件就会自动发送到你设置的邮箱，并被kindle所读取。如果你设置了不发送邮件，可以从当前目录下生成的data目录中找到两个.mobi文件，将较小的那个拷贝到kindle上也可以正常阅读。可以通过计划任务来让程序定期运行</li>
+<li>如果你的<code>kindlereader.exe</code>一闪而过，说明出错了，请到windows命令行下运行它来查看出错信息</li>
 </ol>
 <h2 id="linux用户使用方法桌面用户vps用户">
     <a href="#linux%e7%94%a8%e6%88%b7%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95%e6%a1%8c%e9%9d%a2%e7%94%a8%e6%88%b7vps%e7%94%a8%e6%88%b7" class="anchor">
@@ -222,45 +216,32 @@
     Linux用户使用方法（虚拟主机用户，以Hostmonster为例）
 </h2>
 <ol>
-<li>
-<p>如果你的系统默认python版本就是2.7（运行python，查看显示的版本），那么使用方法完全和上面桌面/VPS用户一样</p>
-</li>
-<li>
-<p>如果你系统默认的python不是2.7版本，请按照下面的说明安装2.7版本的python</p>
-</li>
-<li>
-<p>修改<code>~/.bash_profile</code>文件，确保文件中有以下内容（如已有某行，不用再写这一行）</p>
-<pre><code> PATH=$HOME/bin:$PATH
- LD_LIBRARY_PATH=$HOME/lib/
- export PATH
- export LD_LIBRARY_PATH
-</code></pre>
-</li>
-<li>
-<p>安装python</p>
-<pre><code> $ wget http://www.python.org/ftp/python/2.7.4/Python-2.7.4.tgz
- $ tar -xvfz Python-2.7.4.tgz
- $ cd  Python-2.7.4
- $ ./configure --prefix $HOME
- $ make install
-</code></pre>
-</li>
-<li>
-<p>确保<code>kindlereader.py</code>和<code>config.ini</code>、<code>kindlegen</code>和<code>lib</code>目录都存在的情况下，运行<code>~/bin/python kindlereader.py</code>即可</p>
-</li>
-<li>
-<p>可以使用脚本以便cron来运行，假设你的家目录是<code>/home1/xxx/</code>,你将<code>kindlereader.py</code>、<code>kindlegen</code>和<code>config.ini</code>存放在<code>/home1/xxx/kindle/</code>下面，那么写一个<code>kindle.sh</code>放在同一目录下</p>
-<pre><code> #!/bin/sh
- cd /home1/xxx/kindle/
- /home1/xxx/bin/python kindlereader.py
-</code></pre>
-</li>
-<li>
-<p>在虚拟主机控制面板里的“时钟守护作业”中填入<code>/home1/xxx/kindle/kindle.sh</code>，我选的运行频率是<code>0 15 */3 * *</code>，即每三天运行一次，在主机时间的每天15点。</p>
-</li>
-<li>
-<p>顺便可以再做一个cron任务，用于清理生成的data目录，填入<code>rm -rf /home1/xxx/kindle/data/</code>即可，频率和上面一样，但时间要推迟一点，比如<code>0 16 */3 * *</code></p>
-</li>
+<li>如果你的系统默认python版本就是2.7（运行python，查看显示的版本），那么使用方法完全和上面桌面/VPS用户一样</li>
+<li>如果你系统默认的python不是2.7版本，请按照下面的说明安装2.7版本的python</li>
+<li>修改<code>~/.bash_profile</code>文件，确保文件中有以下内容（如已有某行，不用再写这一行）</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/bin:<span class="nv">$PATH</span>
+</span></span><span class="line"><span class="cl"><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$HOME</span>/lib/
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> PATH
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> LD_LIBRARY_PATH
+</span></span></code></pre></div><ol start="4">
+<li>安装python</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ wget http://www.python.org/ftp/python/2.7.4/Python-2.7.4.tgz
+</span></span><span class="line"><span class="cl">$ tar -xvfz Python-2.7.4.tgz
+</span></span><span class="line"><span class="cl">$ <span class="nb">cd</span>  Python-2.7.4
+</span></span><span class="line"><span class="cl">$ ./configure --prefix <span class="nv">$HOME</span>
+</span></span><span class="line"><span class="cl">$ make install
+</span></span></code></pre></div><ol start="5">
+<li>确保<code>kindlereader.py</code>和<code>config.ini</code>、<code>kindlegen</code>和<code>lib</code>目录都存在的情况下，运行<code>~/bin/python kindlereader.py</code>即可</li>
+<li>可以使用脚本以便cron来运行，假设你的家目录是<code>/home1/xxx/</code>,你将<code>kindlereader.py</code>、<code>kindlegen</code>和<code>config.ini</code>存放在<code>/home1/xxx/kindle/</code>下面，那么写一个<code>kindle.sh</code>放在同一目录下</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/sh
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="nb">cd</span> /home1/xxx/kindle/
+</span></span><span class="line"><span class="cl">/home1/xxx/bin/python kindlereader.py
+</span></span></code></pre></div><ol start="7">
+<li>在虚拟主机控制面板里的“时钟守护作业”中填入<code>/home1/xxx/kindle/kindle.sh</code>，我选的运行频率是<code>0 15 */3 * *</code>，即每三天运行一次，在主机时间的每天15点。</li>
+<li>顺便可以再做一个cron任务，用于清理生成的data目录，填入<code>rm -rf /home1/xxx/kindle/data/</code>即可，频率和上面一样，但时间要推迟一点，比如<code>0 16 */3 * *</code></li>
 </ol>
 <h2 id="常见问题">
     <a href="#%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98" class="anchor">
@@ -331,13 +312,11 @@
     <section class="container">
         <nav class="footer-links">
             
-            <a href="/index.xml">RSS</a>
-            
         </nav>
 
         
     </section>
-    <script defer src="/ts/features.c81551cd4dbef120af278f16966a41142c02be9ff5d6a669be09820fbf047456.js" 
+    <script defer src="/ts/features.f658accd96ff946aea04e7fca44a794f9632d32718aaf69be3f0f434b3ac6118.js" 
     data-enable-footnotes="true"
     ></script>
 </footer>

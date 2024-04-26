@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
-    
-<head>
+    <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -10,23 +9,27 @@
 
     
     
-    
+
     <meta property="og:site_name" content="WilliamGates&#39; Blog" />
-    <meta property="og:title" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog"/>
+    <meta property="og:title" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
     <meta itemprop="name" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
     <meta name="twitter:title" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
     <meta name="application-name" content="（新版）对gaeproxy的“https代理”功能之分析和说明 | WilliamGates&#39; Blog" />
 
 
-    <meta name="description" content="" />
-    <meta name="twitter:description" content=""/>
-    <meta itemprop="description" content=""/>
-    <meta property="og:description" content="" />
+    <meta name="description"
+        content="" />
+    <meta name="twitter:description"
+        content="" />
+    <meta itemprop="description"
+        content="" />
+    <meta property="og:description"
+        content="" />
 
     
 
 
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="/%20favicon.ico" />
     
     <link rel="stylesheet" href="/sass/main.min.ab99ff095f832511e24ffb2fba2b51ad473b2f7e9301d674eba2c6c3a6e8bd81.css">
     
@@ -65,6 +68,8 @@
                 <a href="/links/">Links</a>
                 
                 <a href="/posts/">Posts</a>
+                
+                <a href="/index.xml">RSS</a>
                 
                 <button id="dark-mode-button">
                   <svg class="light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 36 36"><path fill="#FFD983" d="M30.312.776C32 19 20 32 .776 30.312c8.199 7.717 21.091 7.588 29.107-.429C37.9 21.867 38.03 8.975 30.312.776z"/><path d="M30.705 15.915a1.163 1.163 0 1 0 1.643 1.641a1.163 1.163 0 0 0-1.643-1.641zm-16.022 14.38a1.74 1.74 0 0 0 0 2.465a1.742 1.742 0 1 0 0-2.465zm13.968-2.147a2.904 2.904 0 0 1-4.108 0a2.902 2.902 0 0 1 0-4.107a2.902 2.902 0 0 1 4.108 0a2.902 2.902 0 0 1 0 4.107z" fill="#FFCC4D"/><rect x="0" y="0" width="36" height="36" fill="rgba(0, 0, 0, 0)" /></svg>
@@ -110,19 +115,9 @@
 <p>　　说明1：gaeproxy的“https代理”功能<br>
 　　该功能实际上是将https的请求和回应通过作者提供的代理服务器来进行代理，原理如下：<br>
 　　没有打开“https代理”功能时，所有的流量都通过goagent服务器端，而goagent服务器端是部署在google appengine（GAE）上的，在客户和服务器之间，只有google的服务器存在，这个过程中只要你信任google的服务器，就是相对安全的。如图：</p>
-<p><img loading="lazy" 
-    src="/assets/img/gaeproxy-analysis-01.png" 
-    alt="gaeproxy-analysis-01" 
-     
-    width=625 
-    height="725"  /></p>
+<p><img loading="lazy" src="/assets/img/gaeproxy-analysis-01.png" alt="gaeproxy-analysis-01"  width=625 height="725" /></p>
 <p>　　打开“https代理”功能时，https流量（往往是敏感数据，不过会被加密，并非明文）会通过作者提供的服务器代理，而不经过goagent的服务器端，这时候如果有人攻破了作者提供的服务器，在其上进行中间人欺骗，或者解密用户与目的服务器交换的数据（并非完全不可能），会给用户造成无法估量的损失。如图：</p>
-<p><img loading="lazy" 
-    src="/assets/img/gaeproxy-analysis-02.png" 
-    alt="gaeproxy-analysis-02" 
-     
-    width=617 
-    height="725"  /></p>
+<p><img loading="lazy" src="/assets/img/gaeproxy-analysis-02.png" alt="gaeproxy-analysis-02"  width=617 height="725" /></p>
 <p>　　说明2：风险所在<br>
 　　如上文所述，典型的goagent架构全程只通过google所维护的服务器来代理，虽然由于gae不支持https connect，所以在google的服务器上https请求会被解码并重编码（我理解如此，未必正确），所以不管是PC还是android上访问https网站，都需要导入证书。<br>
 　　而gaeproxy作者提供的https代理不经过google的服务器，而是经过作者自己提供并维护的服务器，考虑到人力物力上的差距，作者维护的服务器在安全性上不如google的服务器来得可信，这就是我们所担心的。</p>
@@ -167,13 +162,11 @@
     <section class="container">
         <nav class="footer-links">
             
-            <a href="/index.xml">RSS</a>
-            
         </nav>
 
         
     </section>
-    <script defer src="/ts/features.c81551cd4dbef120af278f16966a41142c02be9ff5d6a669be09820fbf047456.js" 
+    <script defer src="/ts/features.f658accd96ff946aea04e7fca44a794f9632d32718aaf69be3f0f434b3ac6118.js" 
     data-enable-footnotes="true"
     ></script>
 </footer>
