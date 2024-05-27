@@ -6,10 +6,183 @@
     <description>WilliamGates&#39; Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 26 Apr 2024 21:56:00 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 27 May 2024 10:35:00 +0800</lastBuildDate>
     
     <atom:link href="https://blog.williamgates.net/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>在Linux环境下使用开源工具玩中国象棋</title>
+      <link>https://blog.williamgates.net/2024/05/play-xiangqi-in-linux-with-open-source-tools/</link>
+      <pubDate>Mon, 27 May 2024 10:35:00 +0800</pubDate>
+      
+      <guid>https://blog.williamgates.net/2024/05/play-xiangqi-in-linux-with-open-source-tools/</guid>
+      <description>&lt;p&gt;　　中国象棋有悠久的历史，是老少皆宜的棋类项目。在象棋竞技上，人类早早就被AI（广义上的，很原始的AI就够了）彻底击败了，但由于象棋的特性，AI的“高明”之处相对来说更容易被人类所理解，所以不论是与AI对弈，还是使用AI进行对局分析、观看AI对弈，都有一定的乐趣可言。&lt;/p&gt;
+&lt;p&gt;　　但是事情没这么简单。某天突发奇想，试图在自己的电脑上跑个象棋AI，这时候才发现，虽然个人电脑的算力完全足以运行先进的象棋AI（而且完全不需要GPU出手），但几乎所有的中国象棋软件都不开源，几乎所有会被windows报毒，几乎所有都不支持在虚拟机中运行，几乎所有都有收费版本，甚至有多个莫名其妙的收费层级。显然，这里的“几乎所有”是一种严谨而委婉的说法。结合从论坛看到的信息，我猜测这些软件的主要付费客群可能是在网络对弈中开挂的无聊人士，所以他们非常在乎在软件以外的其他界面上自动识别和自动行棋的能力，以及微小的棋力差距，而这些都不是我们想随随便便和AI下棋、看AI下棋的人关心的事。&lt;/p&gt;
+&lt;p&gt;　　一个稍有一点点技术常识的人能忍这些？我只好尝试完全基于开源方案的中国象棋，并且希望在Linux（实际上是WSL2）环境下运行，减少风险。本文就是关于这些实践的经验介绍。这些开源方案基本上都与国际象棋（Chess）相关软件有渊源，下文介绍时也将在一定程度上使用国际象棋相关的术语、引用与国际象棋相关的页面。&lt;/p&gt;
+&lt;h2 id=&#34;相关术语&#34;&gt;
+    &lt;a href=&#34;#%e7%9b%b8%e5%85%b3%e6%9c%af%e8%af%ad&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    相关术语
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.chessprogramming.org/Engines&#34;&gt;&lt;code&gt;Engine&lt;/code&gt;&lt;/a&gt;，which is the chess playing part of the chess program, relying on proprietary or standard protocols communicating with an external graphical user interfaces. 引擎是决定走法的部分，是“后端”。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.chessprogramming.org/GUI&#34;&gt;&lt;code&gt;GUI&lt;/code&gt;&lt;/a&gt;，Graphical User Interface (GUI), a user interface where interaction between user and a (chess) program takes place. 用户界面就是呈现棋盘、供用户操作（包括走棋和编辑棋局等）的“前端”。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.chessprogramming.org/Protocols&#34;&gt;&lt;code&gt;Protocol&lt;/code&gt;&lt;/a&gt;，a formal description of digital message formats and the rules for exchanging those messages in or between computing systems. 在象棋软件中，协议指的是前端界面和后端引擎之间联系的协议，通过约定协议，可以允许界面和引擎之间进行自由搭配（下文会提到，并非如此）,也有助于开发者只开发引擎或只开发界面，致力于自己感兴趣的部分。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.chessprogramming.org/Opening_Book&#34;&gt;&lt;code&gt;Opening Book&lt;/code&gt;&lt;/a&gt;，chess programs often look up the positions at the beginning of the game in an Opening Book. 开局库，让引擎根据一定的定势起手，减少开局阶段的运算量，提高开局速度，也可能在一定程度上提高棋力。基于我们的目的，本文不涉及开局库，你当然可以自己加载开局库。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Chess_variant&#34;&gt;&lt;code&gt;Chess variant&lt;/code&gt;&lt;/a&gt;，指国际象棋的各类变种。这里有一点历史争论，国际上一般认为各种象棋都是源自一种印度的游戏——恰图兰卡，7世纪时流传至波斯成为波斯象棋，而波斯象棋传入中国成宝应象棋，最后中国人在宋代改造成象棋，换言之，中国象棋就是一种&lt;code&gt;chess variant&lt;/code&gt;；但中国象棋界主张中国象棋是从春秋战国时期的“六博”演绎而来（以上两种观点均来自&lt;a href=&#34;https://zh.wikipedia.org/wiki/%E8%B1%A1%E6%A3%8B&#34;&gt;维基百科&lt;/a&gt;）。折衷来说，&lt;a href=&#34;https://en.wikipedia.org/w/index.php?title=List_of_chess_variants&amp;amp;section=26#Chess-related_historical_and_regional_games&#34;&gt;维基百科&lt;/a&gt;将象棋归类为 &amp;ldquo;Chess-related historical and regional games&amp;rdquo;。抛开历史争论不谈，由于开发者一般这么认为，本文的语境中中国象棋与日本将棋、韩国将棋等一样，都是&lt;code&gt;chess variant&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.chessprogramming.org/NNUE&#34;&gt;&lt;code&gt;nnue&lt;/code&gt;&lt;/a&gt;，Efficiently Updatable Neural Networks，a Neural Network architecture intended to replace the evaluation of Shogi, chess and other board game playing alpha-beta searchers running on a CPU. NNUE是一种神经网络，能够减少计算量、提升引擎的棋力。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.chessprogramming.org/Forsyth-Edwards_Notation&#34;&gt;&lt;code&gt;FEN&lt;/code&gt;&lt;/a&gt;，Forsyth-Edwards Notation，以字符串表示棋局的方式。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;可用的开源方案&#34;&gt;
+    &lt;a href=&#34;#%e5%8f%af%e7%94%a8%e7%9a%84%e5%bc%80%e6%ba%90%e6%96%b9%e6%a1%88&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    可用的开源方案
+&lt;/h2&gt;
+&lt;h3 id=&#34;引擎&#34;&gt;
+    &lt;a href=&#34;#%e5%bc%95%e6%93%8e&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    引擎
+&lt;/h3&gt;
+&lt;p&gt;　　上文提到“几乎所有”中国象棋软件都不开源，但其中的部分将引擎以二进制形式发布出来，但我不想讨论，也不想提到他们的名字。&lt;/p&gt;
+&lt;p&gt;　　近年正在开发的开源的引擎主要包括两个：&lt;a href=&#34;https://github.com/fairy-stockfish/Fairy-Stockfish&#34;&gt;&lt;code&gt;Fairy-Stockfish&lt;/code&gt;&lt;/a&gt;和&lt;a href=&#34;https://github.com/official-pikafish/Pikafish&#34;&gt;&lt;code&gt;Pikafish&lt;/code&gt;&lt;/a&gt;，两者都自称脱胎于著名的国际象棋引擎&lt;a href=&#34;https://github.com/official-stockfish/Stockfish&#34;&gt;&lt;code&gt;Stockfish&lt;/code&gt;&lt;/a&gt;，前者是一个致力于多种chess variant且支持多种协议的大而全的引擎，国内有人翻译为“仙鱼”；后者是中国人开发的专用于中国象棋的引擎，中文名为“皮卡鱼”。一般而言，公认Pikafish比Fairy-Stockfish的棋力要强一些，近期的开发也更积极。当然，对于我们的目的而言，棋力的微小差距并不那么重要。&lt;/p&gt;
+&lt;p&gt;　　有一个古老的开源引擎&lt;a href=&#34;https://github.com/xqbase/eleeye/tree/master&#34;&gt;象眼&lt;/a&gt;，近年还有微小的更新，我没有尝试，有兴趣的人可以自己研究看看。&lt;/p&gt;
+&lt;h3 id=&#34;界面&#34;&gt;
+    &lt;a href=&#34;#%e7%95%8c%e9%9d%a2&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    界面
+&lt;/h3&gt;
+&lt;p&gt;　　界面是“几乎所有”中国象棋软件的重灾区，研发个引擎不行，研发个（骗钱或挂马的）界面还是不难的。还是那句话，我不想讨论，也不想提到他们的名字。&lt;/p&gt;
+&lt;p&gt;　　目前支持中国象棋的开源界面主要有两个：&lt;a href=&#34;https://www.gnu.org/software/xboard/&#34;&gt;&lt;code&gt;XBoard&lt;/code&gt;&lt;/a&gt;和&lt;a href=&#34;https://github.com/ml-research/liground&#34;&gt;&lt;code&gt;LiGround&lt;/code&gt;&lt;/a&gt;。前者从上古时代延续至今（可考的最早发布时间为1991年，最新版4.9.1发布于2016年），功能强大，一切基本上都可以定制，也可以在图形界面上直接编辑棋局。后者的目标是 &amp;ldquo;modern Chess Variant Analysis GUI for the 21st century&amp;rdquo;，界面更好看（见仁见智），只能使用FEN编辑棋局，现在还在更新，但不能算处于积极开发状态。&lt;/p&gt;
+&lt;p&gt;　　其他主流国际象棋界面大多明确表示没有支持variant的计划，或者没有支持中国象棋的计划，例如&lt;a href=&#34;https://github.com/pychess/pychess&#34;&gt;&lt;code&gt;pyChess&lt;/code&gt;&lt;/a&gt;。目前最接近支持中国象棋的界面是&lt;a href=&#34;https://github.com/cutechess/cutechess&#34;&gt;&lt;code&gt;Cute Chess&lt;/code&gt;&lt;/a&gt;,有一个&lt;a href=&#34;https://github.com/cutechess/cutechess/pull/565&#34;&gt;PR&lt;/a&gt;支持中国象棋，但没有被合并。&lt;/p&gt;
+&lt;p&gt;　　请注意在WSL2中使用图形界面（也就是WSLg），需要一些技巧和设置，比如你需要遵循&lt;a href=&#34;https://learn.microsoft.com/zh-cn/windows/wsl/tutorials/gui-apps&#34;&gt;微软的指引&lt;/a&gt;，你的发行版可能会对WSLg有特定的安排（比如&lt;a href=&#34;https://en.opensuse.org/openSUSE:WSL#Enabling_GUI_support_(WSLg)&#34;&gt;OpenSUSE的&lt;/a&gt;）,你可能遇到问题（比如我就遇到重启后&lt;code&gt;cannot open display: :0&lt;/code&gt;的问题）需要&lt;a href=&#34;https://github.com/microsoft/wslg/wiki/Diagnosing-%22cannot-open-display%22-type-issues-with-WSLg&#34;&gt;解决方法&lt;/a&gt;。具体请自行摸索。&lt;/p&gt;
+&lt;h3 id=&#34;协议&#34;&gt;
+    &lt;a href=&#34;#%e5%8d%8f%e8%ae%ae&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    协议
+&lt;/h3&gt;
+&lt;p&gt;　　与中国象棋有关的协议主要包括&lt;a href=&#34;https://www.chessprogramming.org/Chess_Engine_Communication_Protocol&#34;&gt;&lt;code&gt;CECP&lt;/code&gt;&lt;/a&gt;，&lt;a href=&#34;https://www.chessprogramming.org/UCI&#34;&gt;&lt;code&gt;UCI&lt;/code&gt;&lt;/a&gt;和&lt;a href=&#34;https://www.xqbase.com/protocol/cchess_ucci.htm&#34;&gt;&lt;code&gt;UCCI&lt;/code&gt;&lt;/a&gt;,其中CECP主要是xboard及其windows衍生版本winboard在用，它们也只支持这一种协议（其他协议可以通过工具转换），所以该协议也被很多程序称为xboard协议；UCI是使用最广泛的国际象棋协议，中国象棋在使用的时候如果处理不当会有兼容性问题（下文会提到）；UCCI是专为中国象棋制定的协议，几乎没有开源界面支持（这里的几乎还是一种严谨而委婉的说法）。Pikafish只支持UCI协议，而Fairy-Stockfish支持CECP/UCI/UCCI协议。&lt;/p&gt;
+&lt;h2 id=&#34;实际使用&#34;&gt;
+    &lt;a href=&#34;#%e5%ae%9e%e9%99%85%e4%bd%bf%e7%94%a8&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    实际使用
+&lt;/h2&gt;
+&lt;p&gt;　　从上文可以看出，我们基本上只有两种引擎、两种界面可用，他们组合起来分别有以下技巧和问题：&lt;/p&gt;
+&lt;h3 id=&#34;xboardfairy-stockfish&#34;&gt;
+    &lt;a href=&#34;#xboardfairy-stockfish&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    XBoard&amp;#43;Fairy-Stockfish
+&lt;/h3&gt;
+&lt;p&gt;　　一般的发行版都带有XBoard包（我用的是OpenSUSE的包），默认没有提供中国象棋棋盘和棋子，如果你安装的版本也是这样，那么可以在&lt;a href=&#34;https://github.com/Kadagaden/chess-pieces&#34;&gt;Kadagaden/chess-pieces&lt;/a&gt;或者其他地方下载棋盘和棋子，然后在XBoard中打开&lt;code&gt;View - Edit Theme List...&lt;/code&gt;，添加形如这样的配置（注意坑点：路径写&lt;code&gt;~&lt;/code&gt;不能识别，也没有报错；写&lt;code&gt;~~&lt;/code&gt;指的是安装路径，例如&lt;code&gt;/usr/share/games/xboard&lt;/code&gt;），然后在&lt;code&gt;View - Board...&lt;/code&gt;中双击&lt;code&gt;gmchess&lt;/code&gt;就可以使用相应棋盘和棋子配置了（如果你棋盘显示不正常，根据下一步加载引擎后就会正常了）：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;&amp;#34;gmchess&amp;#34; -ubt true -lbtf &amp;#34;/home/you/xboard/gmchess_wood/xiangqi_gmchess_wood.png&amp;#34; -dbtf &amp;#34;/home/you/xboard/gmchess_wood/xiangqi_gmchess_wood.png&amp;#34; -lbtm 1 -dbtm 1 -lsc #C8C365 -dsc #77A26D -ub false -upf false -pid &amp;#34;/home/you/xboard/gmchess_wood&amp;#34; -trueColors true -hsc #FFFF00 -phc #FF0000 -overrideLineGap 0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;　　你需要在&lt;a href=&#34;https://github.com/fairy-stockfish/Fairy-Stockfish-NNUE/releases&#34;&gt;fairy-stockfish/Fairy-Stockfish-NNUE&lt;/a&gt;而不是&lt;a href=&#34;https://github.com/fairy-stockfish/Fairy-Stockfish/releases&#34;&gt;fairy-stockfish/Fairy-Stockfish&lt;/a&gt;下载最新版的引擎（引擎已经内置nnue文件），前者最新版是&lt;a href=&#34;https://github.com/fairy-stockfish/Fairy-Stockfish-NNUE/releases/tag/xiangqi-aa162e1771e5&#34;&gt;2023年1月的&lt;/a&gt;，比后者的&lt;a href=&#34;https://github.com/fairy-stockfish/Fairy-Stockfish/releases/tag/fairy_sf_14_0_1_xq&#34;&gt;2021年11月&lt;/a&gt;要新；记得要下载标着xiangqi或者largeboard的版本。&lt;/p&gt;
+&lt;p&gt;　　Fairy-Stockfish支持CECP协议，所以只需要在XBoard的&lt;code&gt;Engine - Edit Engine List...&lt;/code&gt;中添加形如这样的配置，然后在&lt;code&gt;Engine - Load New 1st Engine&lt;/code&gt;的界面中双击&lt;code&gt;Fairy-Stockfish&lt;/code&gt;就可以调入引擎了（同样注意路径的坑，这里用&lt;code&gt;-fd&lt;/code&gt;指定工作目录的方法不可以用于上面的Theme List：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;&amp;#34;Fairy-Stockfish&amp;#34; /variant&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;xiangqi -fcp &amp;#34;./fairy-stockfish-largeboard_x86-64-bmi2&amp;#34; -fd &amp;#34;/home/you/xboard/fairy-stockfish&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;　　如果加载后XBoard崩溃跳出，可以尝试加载一下其他象棋引擎（也就是Pikafish了）再加载Fairy-Stockfish。&lt;/p&gt;
+&lt;p&gt;　　XBoard的&lt;code&gt;Engine - Common Settings...&lt;/code&gt;中可以调整一些与引擎有关的设置，&lt;a href=&#34;https://github.com/official-pikafish/Pikafish/wiki/Pikafish-FAQ#optimal-settings&#34;&gt;Pikafish建议&lt;/a&gt;把CPU数设高，Hash-Table设高（达到1-2GB）。XBoard的&lt;code&gt;Engine - Engine #1 Settings&lt;/code&gt;里面还有具体引擎的设置，&lt;a href=&#34;https://github.com/official-pikafish/Pikafish/wiki/Pikafish-FAQ#optimal-settings&#34;&gt;Pikafish建议&lt;/a&gt;把MultiPV设成1。&lt;/p&gt;
+&lt;p&gt;　　然后你执红走一步，引擎就会执黑走棋了。如果没有加载开局库，一开始几步棋会很慢，可以通过引擎输出界面看看它在做什么。当然你也可以不走棋，使用&lt;code&gt;Mode - Two Machines&lt;/code&gt;让引擎对弈（需要加载1st和2nd引擎）。你还可以在&lt;code&gt;Mode - Edit Position&lt;/code&gt;状态下编辑棋局，用左键拖动棋子，右键修改棋子（点击后向不同方向拖动右键可以改变棋子内容，滚轮也可以）；编辑完之后选择Mode（例如Machine Black）就可以开始下棋了，如果XBoard报告&amp;quot;It&amp;rsquo;s not black&amp;rsquo;s turn&amp;quot;之类的，那么你要操作另一方先走一步再点击相应Mode。&lt;/p&gt;
+&lt;h3 id=&#34;xboardpikafish&#34;&gt;
+    &lt;a href=&#34;#xboardpikafish&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    XBoard&amp;#43;Pikafish
+&lt;/h3&gt;
+&lt;p&gt;　　XBoard的部分与上一节相同，而引擎的部分有所区别。&lt;/p&gt;
+&lt;p&gt;　　虽然Pikafish的各个版本可以从&lt;a href=&#34;https://github.com/official-pikafish/Pikafish/releases&#34;&gt;official-pikafish/Pikafish&lt;/a&gt;中轻易获得，但是它并没有像Fairy-Stockfish一样集成nnue文件，不同版本的引擎不可换用其他版本的nnue文件。而除了最新版本对应的nnue文件可以从&lt;a href=&#34;https://github.com/official-pikafish/Networks&#34;&gt;official-pikafish/Networks&lt;/a&gt;下载到以外，其他版本的nnue文件是没有官方途经可下载的（official-pikafish/Networks中只有一个release，但每当有新的nnue，作者就会更新这个release并删掉旧的文件，理由不明）。你需要把引擎文件和nnue文件放到同一个目录，两者的文件名最好相同（例如pikafish和pikafish.nnue）以便自动调用。&lt;/p&gt;
+&lt;p&gt;　　Pikafish不支持CECP协议，你需要使用&lt;a href=&#34;https://www.chessprogramming.org/UCI2WB&#34;&gt;&lt;code&gt;uci2wb&lt;/code&gt;&lt;/a&gt;(意思是UCI to Winboard)程序来转换。关于uci2wb的介绍到处都有，但是源码和二进制程序有一点难找……&lt;a href=&#34;http://hgm.nubati.net/cgi-bin/gitweb.cgi&#34;&gt;作者网站上的源码&lt;/a&gt;打不开，有人提供了一份可能不是最新的源码在&lt;a href=&#34;https://github.com/ianfab/uci2wb&#34;&gt;ianfab/uci2wb&lt;/a&gt;，我是从&lt;a href=&#34;https://packages.ubuntu.com/noble/uci2wb&#34;&gt;Ubuntu的包&lt;/a&gt;里面获得二进制程序的。在XBoard中这样设置引擎：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;&amp;#34;Pikafish&amp;#34; /variant&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;xiangqi -fcp &amp;#34;./uci2wb ./pikafish-bmi2&amp;#34; -fd &amp;#34;/home/you/xboard/pikafish&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;　　也许你觉得XBoard有个-fUCI参数，加载引擎的界面上也可以选UCI，不是能直接用么？实际上这个参数会调用比uci2wb更古老的一个转换器polyglot，而它和uci2wb一样不是XBoard自带的，需要去找，还不如直接用uci2wb，因此上面的设置实际上等价于&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;&amp;#34;Pikafish&amp;#34; /variant&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;xiangqi -fUCI -adapterCommand &amp;#34;./uci2wb ./pikafish-bmi2 &amp;#34;%fd&amp;#34;&amp;#34; -fd &amp;#34;/home/you/xboard/pikafish&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;　　uci2wb这个协议转换器带来一个重要的问题：XBoard与Pikafish连用时，无法支持残局，使用残局开局会崩溃跳出。个人推测可能是uci2wb并没有把初始局面正确告知引擎，技术水平有限无法分析代码，只能猜测了。&lt;/p&gt;
+&lt;h3 id=&#34;ligroundfairy-stockfish&#34;&gt;
+    &lt;a href=&#34;#ligroundfairy-stockfish&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Liground&amp;#43;Fairy-Stockfish
+&lt;/h3&gt;
+&lt;p&gt;　　Liground内置了三个引擎（包含了某个版本的Fairy-Stockfish，所以你不下载引擎也可以），你可以把自己下载的Fairy-Stockfish放到&lt;code&gt;./resources/engines/&lt;/code&gt;目录下去替换相应文件。
+　　在界面中，左边选择棋盘和棋子的样式，右上区域的下拉框选择&lt;code&gt;Xiangqi&lt;/code&gt;，然后引擎的下拉框就只有支持中国象棋的引擎可选了。你可以通过界面上的FEN栏来编辑局面。界面上打开PVE开关，并且把引擎后面的启用开关也打开，就可以与AI对弈了。可惜的是，Liground并不支持两个引擎对弈，虽然可以添加和删除引擎，但多个引擎只会对下一步的可能性进行分析，并不会行棋。
+　　&lt;/p&gt;
+&lt;h3 id=&#34;ligroundpikafish&#34;&gt;
+    &lt;a href=&#34;#ligroundpikafish&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    Liground&amp;#43;Pikafish
+&lt;/h3&gt;
+&lt;p&gt;　　这是最麻烦的一套组合，因为Pikafish虽然支持UCI协议，但棋盘编号、UCI option等方面与Liground并不兼容。根据&lt;a href=&#34;https://github.com/ml-research/liground/issues/261&#34;&gt;Liground&lt;/a&gt;和&lt;a href=&#34;https://github.com/official-pikafish/Pikafish/issues/40&#34;&gt;Pikafish&lt;/a&gt;两边的issue，你需要使用修改了代码的Pikafish。&lt;a href=&#34;https://github.com/mtaktikos/Pikafish/tree/liground-compatible&#34;&gt;mtaktikos/Pikafish&lt;/a&gt;是一个修改后的230216版，但是你很可能没法找到230216版Pikafish对应的nnue文件……所以我根据mtaktikos的工作照抄了一个231203版的，在&lt;a href=&#34;https://github.com/williamgateszhao/Pikafish/tree/liground&#34;&gt;williamgateszhao/Pikafish&lt;/a&gt;，release中附上了231203版Pikafish对应的nnue文件。&lt;/p&gt;
+&lt;h2 id=&#34;结论&#34;&gt;
+    &lt;a href=&#34;#%e7%bb%93%e8%ae%ba&#34; class=&#34;anchor&#34;&gt;
+        &lt;svg class=&#34;icon&#34; aria-hidden=&#34;true&#34; focusable=&#34;false&#34; height=&#34;16&#34; version=&#34;1.1&#34; viewBox=&#34;0 0 16 16&#34; width=&#34;16&#34;&gt;
+            &lt;path fill-rule=&#34;evenodd&#34;
+                d=&#34;M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z&#34;&gt;
+            &lt;/path&gt;
+        &lt;/svg&gt;
+    &lt;/a&gt;
+    结论
+&lt;/h2&gt;
+&lt;p&gt;　　完全使用开源方案跑中国象棋还挺麻烦的……这可能和中文软件开发的恶劣环境有关，我不想多说。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果你只是想和轻易碾压你的AI下棋，你可以使用以上四种组合中的任意一种，其中Liground+Fairy-Stockfish可能是相对简单的方案。&lt;/li&gt;
+&lt;li&gt;如果你想使用残局与AI对弈，你可以选XBoard+Fairy-Stockfish，Liground+Pikafish或Liground+Fairy-Stockfish。&lt;/li&gt;
+&lt;li&gt;如果你想让两个AI对弈，你可以用XBoard+Pikafish或XBoard+Fairy-Stockfish。使用不同版本的引擎，让他们对弈也挺有乐趣的，也许还能学习一下走法。&lt;/li&gt;
+&lt;li&gt;如果你想使用残局让两个AI对弈，你只能使用XBoard+Fairy-Stockfish。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;　　本文没涉及到的部分包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;XBoard有可能崩溃，除了本文提到的先载入Pikafish再载入Fairy-Stockfish（哪怕你只想载入后者）的技巧之外，还可能有其他情况、其他解决方案，请自行摸索。&lt;/li&gt;
+&lt;li&gt;Pikafish和Fairy-Stockfish引擎本身都有一些选项可以调整，我也没有形成经验，就不胡说了，你可以看他们各自的wiki自行摸索。&lt;/li&gt;
+&lt;li&gt;Pikafish制定了一个“&lt;a href=&#34;https://pikafish.org/rule.pdf&#34;&gt;中国象棋程序竞赛规则&lt;/a&gt;”，这个规则和人类竞赛规则并不完全一样，越新版本的Pikafish越向这个规则靠拢，或者说逐步取消了一些符合人类竞赛规则的选项。这会导致其他引擎觉得合法的走法Pikafish认为是禁手，或者反过来Pikafish认为是合法的走法被XBoard认为是禁手（对于后一种情况也许可以调整XBoard的&lt;code&gt;Adjudications&lt;/code&gt;界面中的选项），我的象棋水平太差没法具体分析，请自行摸索&lt;/li&gt;
+&lt;li&gt;通过不同的时间限制，也许可以让AI对弈更有趣，但引擎似乎不完全遵守时间限制（按照引擎公开的测试数据，它们应该是遵守的才对），可能是协议或界面的问题，请自行研究。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>使用whisper生成字幕的经验备忘</title>
